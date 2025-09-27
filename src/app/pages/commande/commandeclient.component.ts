@@ -14,17 +14,18 @@ import autoTable from 'jspdf-autotable';
 
 
 @Component({
-  selector: 'app-commande',
+  selector: 'app-commandeclient',
   standalone: true,
   imports: [
     CommonModule,
     RouterModule,
     FormsModule, 
   ],
-  templateUrl: './commande.component.html',
+  templateUrl: './commandeclient.component.html',
   styleUrl: './commande.component.css'
 })
-export class CommandeComponent implements OnInit{
+export class CommandeClientComponent implements OnInit{
+  currentUser: any;
   commandes : Commande[] =[];
   searchTerm: string = '';
 filterStatut: string = '';
@@ -88,13 +89,15 @@ telechargerFacturePDF(commande: Commande) {
   doc.save(`facture_${commande.id}.pdf`);
 }
   ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUser();
    this.getAll();
   }
   constructor(
-    private commandeService : CommandesService
+    private commandeService : CommandesService,
+    private authService: AuthService,
   ){}
-  getAll(){
-      this.commandeService.getAll().subscribe(
+   getAll(){
+      this.commandeService.getByClient().subscribe(
         (data : Commande[])=>{
           this.commandes = data;
           this.commandesFiltrees = [...this.commandes]; 

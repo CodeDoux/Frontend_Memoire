@@ -24,6 +24,20 @@
                 Le nom est requis (minimum 2 caractères).
               </div>
             </div>
+<!-- Saison du produit -->
+            <div class="mb-3">
+              <label for="saison" class="form-label">Saison du produit *</label>
+              <input 
+                formControlName="saison" 
+                type="text" 
+                id="saison" 
+                class="form-control"
+                [class.is-invalid]="form.get('saison')?.invalid && form.get('saison')?.touched"
+                placeholder="Entrez la saison du produit">
+              <div class="invalid-feedback">
+                Le saison est requis (minimum 2 caractères).
+              </div>
+            </div>
 
             <!-- Description -->
             <div class="mb-3">
@@ -68,25 +82,54 @@
                 Le stock est requis et doit être positif.
               </div>
             </div>
+            <!-- note -->
+            <div class="mb-3">
+              <label for="note" class="form-label">note *</label>
+              <input 
+                formControlName="note" 
+                type="number" 
+                min="0"
+                id="note" 
+                class="form-control"
+                [class.is-invalid]="form.get('note')?.invalid && form.get('note')?.touched"
+                placeholder="0">
+              <div class="invalid-feedback">
+                Le note est requis et doit être positif.
+              </div>
+            </div>
+            <!-- poids -->
+            <div class="mb-3">
+              <label for="poids" class="form-label">poids du produit *</label>
+              <input 
+                formControlName="poids" 
+                type="text" 
+                id="poids" 
+                class="form-control"
+                [class.is-invalid]="form.get('poids')?.invalid && form.get('poids')?.touched"
+                placeholder="Entrez le poids du produit">
+              <div class="invalid-feedback">
+                Le poids est requis .
+              </div>
+            </div>
 
             <!-- Image -->
             <div class="mb-3">
-                <label for="image" class="form-label">Image</label>
+  <label for="images" class="form-label">Images</label>
+  <input
+    type="file"
+    id="images"
+    class="form-control"
+    (change)="onFilesSelected($event)"
+    accept="image/*"
+    multiple
+  >
+</div>
 
-               <!-- <div *ngIf="produit?.image" class="mb-2">
-                    <p>Image actuelle: {{ produit.image }}</p>
-                    <img [src]="'http://127.0.0.1:8000/storage/' + produit.image" 
-                        alt="Image actuelle" style="width:150px; height:auto;">
-                </div>
-                -->
-
-                <input 
-                    type="file" 
-                    id="image" 
-                    class="form-control"
-                    (change)="onFileSelected($event)" 
-                    accept="image/*">
-            </div>
+<!-- Aperçu des images sélectionnées -->
+<div *ngFor="let img of selectedImages; let i = index" class="mt-2">
+  <img [src]="img.preview" alt="Aperçu" width="100">
+  <button type="button" (click)="removeImage(i)">Supprimer</button>
+</div>
 
 
             <!-- Catégorie -->

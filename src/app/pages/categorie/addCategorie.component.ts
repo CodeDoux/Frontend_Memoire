@@ -76,6 +76,7 @@ export class AddCategorieComponent {
         )
       } else {
         console.log('🔄 Tentative d\'ajout...');
+        console.log(this.categorieForm.value);
         this.categorieService.addCategorie(this.categorieForm.value).subscribe(
           (response) => {
             console.log('✅ Ajout réussi:', response);

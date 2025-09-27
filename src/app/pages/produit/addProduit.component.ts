@@ -1,23 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Categorie } from '../../models/categorie';
 import { CategorieService } from '../../services/categorie.service';
 import { ProduitService } from '../../services/produit.service';
+import { Produit } from '../../models/produit';
 
 @Component({
-  selector: 'app- addProduit',
+  selector: 'app-addProduit',
   standalone: true,
   imports: [
     HttpClientModule,
     CommonModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './addProduit.component.html',
-  styleUrl: './produit.component.css'
+  styleUrls: ['./produit.component.css']
 })
 export class AddProduitComponent {
   form: FormGroup;
@@ -27,14 +27,9 @@ export class AddProduitComponent {
   isLoading = false;
   isLoadingCategories = true;
   error: string | null = null;
-  selectedFile!: File;
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-    }
-  }
+  // Tableau pour gérer les fichiers et leurs aperçus
+  selectedImages: { file: File | null; preview: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -48,13 +43,21 @@ export class AddProduitComponent {
       description: [''],
       prix: ['', [Validators.required, Validators.min(0.01)]],
       stock: ['', [Validators.required, Validators.min(0)]],
-      image: [''],
+      saison: ['', [Validators.required]],
+      poids: ['', [Validators.required]],
+      note: ['', [Validators.required]],
+      images: this.fb.array([], Validators.required),
       categorie_id: ['', Validators.required]
     });
   }
 
+  // Getter pour FormArray
+  get images(): FormArray {
+    return this.form.get('images') as FormArray;
+  }
+
   ngOnInit(): void {
-    // Vérifier si on est en mode édition
+    // Vérifier si mode édition
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.produitId = Number(id);
@@ -64,7 +67,7 @@ export class AddProduitComponent {
     // Charger les catégories
     this.loadCategories();
 
-    // Si mode édition, charger le produit
+    // Si édition, charger le produit
     if (this.isEditMode && this.produitId) {
       this.loadProduit();
     }
@@ -76,93 +79,125 @@ export class AddProduitComponent {
       next: (categories) => {
         this.categories = categories;
         this.isLoadingCategories = false;
-        console.log('Catégories chargées:', categories);
       },
-      error: (error) => {
+      error: (err) => {
         this.isLoadingCategories = false;
-        console.error('Erreur chargement catégories:', error);
         this.error = 'Erreur lors du chargement des catégories.';
+        console.error(err);
       }
     });
   }
 
   loadProduit(): void {
-    if (this.produitId) {
-      this.isLoading = true;
-      this.produitService.getById(this.produitId).subscribe({
-        next: (produit) => {
-          this.form.patchValue({
-            nom: produit.nom,
-            description: produit.description,
-            prix: produit.prix,
-            stock: produit.stock,
-            image: produit.image,
-            categorie_id: produit.categorie_id
+    if (!this.produitId) return;
+
+    this.isLoading = true;
+    this.produitService.getById(this.produitId).subscribe({
+      next: (produit: Produit) => {
+        this.form.patchValue({
+          nom: produit.nom,
+          description: produit.description,
+          prix: produit.prix,
+          stock: produit.stock,
+          saison: produit.saison,
+          poids: produit.poids,
+          note: produit.note,
+          categorie_id: produit.categorie_id
+        });
+
+        // Charger les images existantes
+        if (produit.images) {
+          produit.images.forEach(url => {
+            this.selectedImages.push({ file: null, preview: url });
+            this.images.push(this.fb.control(null)); // placeholder pour FormArray
           });
-          this.isLoading = false;
-          console.log('Produit chargé pour modification:', produit);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          console.error('Erreur chargement produit:', error);
-          this.error = 'Erreur lors du chargement du produit.';
         }
-      });
+
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.error = 'Erreur lors du chargement du produit.';
+        console.error(err);
+      }
+    });
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+
+    for (let i = 0; i < input.files.length; i++) {
+      const file = input.files[i];
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        this.selectedImages.push({ file, preview: e.target.result });
+        this.images.push(this.fb.control(file));
+      };
+
+      reader.readAsDataURL(file);
     }
+  }
+
+  removeImage(index: number): void {
+    this.selectedImages.splice(index, 1);
+    this.images.removeAt(index);
   }
 
   onSubmit(): void {
-    if (this.form.valid) {
-      this.isLoading = true;
-      this.error = null;
-
-      // Préparer FormData
-      const formData = new FormData();
-      formData.append('nom', this.form.value.nom);
-      formData.append('description', this.form.value.description);
-      formData.append('prix', this.form.value.prix);
-      formData.append('stock', this.form.value.stock);
-      formData.append('categorie_id', this.form.value.categorie_id);
-
-      if (this.selectedFile) {
-        formData.append('image', this.selectedFile);
-      }
-
-      let operation;
-      if (this.isEditMode && this.produitId) {
-        operation = this.produitService.updateProduit(formData, this.produitId); 
-      } else {
-        operation = this.produitService.addProduit(formData); 
-      }
-
-      operation.subscribe({
-        next: (result) => {
-          this.isLoading = false;
-          console.log('Produit sauvegardé:', result);
-          this.router.navigate(['/admin/produit']);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          console.error('Erreur sauvegarde:', error);
-
-          if (error.status === 422) {
-            this.error = 'Données invalides. Vérifiez les champs.';
-          } else if (error.status === 403) {
-            this.error = 'Vous n\'avez pas les permissions pour cette action.';
-          } else {
-            this.error = 'Erreur lors de la sauvegarde. Veuillez réessayer.';
-          }
-        }
-      });
-    } else {
-      Object.keys(this.form.controls).forEach(key => {
-        this.form.get(key)?.markAsTouched();
-      });
+    if (!this.form.valid) {
+      Object.keys(this.form.controls).forEach(key => this.form.get(key)?.markAsTouched());
+      return;
     }
+
+    this.isLoading = true;
+    this.error = null;
+
+    const formData = new FormData();
+    formData.append('nom', this.form.value.nom);
+    formData.append('description', this.form.value.description);
+    formData.append('prix', this.form.value.prix);
+    formData.append('stock', this.form.value.stock);
+    formData.append('poids', this.form.value.poids);
+    formData.append('saison', this.form.value.saison);
+    formData.append('note', this.form.value.note);
+    formData.append('categorie_id', this.form.value.categorie_id);
+
+    // Ajouter toutes les images uploadées
+    this.selectedImages.forEach(img => {
+      if (img.file) {
+        formData.append('images[]', img.file);
+      }
+    });
+
+    let operation$;
+    if (this.isEditMode && this.produitId) {
+      operation$ = this.produitService.updateProduit(formData, this.produitId);
+    } else {
+      operation$ = this.produitService.addProduit(formData);
+    }
+
+    operation$.subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/admin/produit']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        if (err.status === 422) {
+          this.error = 'Données invalides. Vérifiez les champs.';
+        } else if (err.status === 403) {
+          this.error = 'Vous n\'avez pas les permissions pour cette action.';
+        } else {
+          this.error = 'Erreur lors de la sauvegarde. Veuillez réessayer.';
+        }
+        console.error(err);
+      }
+    });
   }
 
-
-  // Méthodes utilitaires pour le template
+  // Méthodes utilitaires pour template
   hasError(fieldName: string): boolean {
     const field = this.form.get(fieldName);
     return !!(field && field.invalid && field.touched);
@@ -170,17 +205,11 @@ export class AddProduitComponent {
 
   getErrorMessage(fieldName: string): string {
     const field = this.form.get(fieldName);
-    if (field?.errors) {
-      if (field.errors['required']) {
-        return `${fieldName} est requis.`;
-      }
-      if (field.errors['minlength']) {
-        return `${fieldName} doit contenir au moins ${field.errors['minlength'].requiredLength} caractères.`;
-      }
-      if (field.errors['min']) {
-        return `${fieldName} doit être supérieur à ${field.errors['min'].min}.`;
-      }
-    }
+    if (!field?.errors) return '';
+
+    if (field.errors['required']) return `${fieldName} est requis.`;
+    if (field.errors['minlength']) return `${fieldName} doit contenir au moins ${field.errors['minlength'].requiredLength} caractères.`;
+    if (field.errors['min']) return `${fieldName} doit être supérieur à ${field.errors['min'].min}.`;
     return '';
   }
 
@@ -188,4 +217,3 @@ export class AddProduitComponent {
     this.router.navigate(['/admin/produit']);
   }
 }
-

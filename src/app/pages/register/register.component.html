@@ -2,12 +2,13 @@
 <form [formGroup]="form" (ngSubmit)="register()"> 
   <input formControlName="nomComplet" placeholder="Nom complet"> 
   <input formControlName="email" type="email" placeholder="Email"> 
-  <input formControlName="password" type="password" placeholder="Mot de passe"> 
-  <!--<select formControlName="role">
+  <input formControlName="password" type="password" placeholder="Mot de passe">
+    <input formControlName="tel" type="text" placeholder="telephone"> 
+  <select formControlName="role">
     <option value="CLIENT">Client</option>
     <option value="EMPLOYE">Employé</option>
     <option value="ADMIN">Admin</option>
-  </select> -->
+  </select>
   <button type="submit">S'inscrire</button> 
 </form> 
 

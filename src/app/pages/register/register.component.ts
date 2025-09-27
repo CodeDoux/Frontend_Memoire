@@ -22,15 +22,21 @@ form: FormGroup;
       this.form = this.fb.group({ 
           nomComplet: ['', Validators.required],  
           email: ['', [Validators.required, Validators.email]], 
-          password: ['', [Validators.required, Validators.minLength(8)]], 
-          role: ['CLIENT'] 
+          password: ['', [Validators.required, Validators.minLength(5)]], 
+          role: ['', Validators.required],
+          tel: ['', Validators.required] 
         });
       }
    
     register() { 
+      console.log("avant");
       if (this.form.valid) { 
+        
         this.auth.register(this.form.value).subscribe({ 
+          
           next: (res : TokenResponse) => { 
+            console.log("apres");
+            
             this.auth.saveToken(res.access_token);
             this.router.navigate(['/login']); 
           }, 

@@ -15,11 +15,18 @@ import { PanierComponent } from './pages/panier/panier.component';
 import { ValiderCommandeComponent } from './pages/valider-commande/valider-commande.component';
 import { EmployeDashboardComponent } from './pages/employe-dashboard/employe-dashboard.component';
 import { PromotionComponent } from './pages/promotion/promotion.component';
+import { UserComponent } from './pages/user/user.component';
+import { AddUserComponent } from './pages/user/addUser.component';
+import { LivraisonComponent } from './pages/livraison/livraison.component';
+import { PaiementComponent } from './pages/paiement/paiement.component';
+import { ChatComponent } from './pages/chat/chat.component';
+import { CommandeClientComponent } from './pages/commande/commandeclient.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // AJOUT: Route par défaut
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  
 
   // Routes pour ADMIN
   {
@@ -28,14 +35,21 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] },
     children: [
+      
+      { path: 'utilisateur', component: UserComponent},
+      { path: 'addUser', component: AddUserComponent, },
+      { path: 'updateUser/:id', component: AddUserComponent, },
       { path: 'categorie', component: CategorieComponent},
       { path: 'addCategorie', component: AddCategorieComponent,  },
       { path: 'updateCategorie/:id', component: AddCategorieComponent,},
       { path: 'produit', component: ProduitComponent, },
       { path: 'addProduit', component: AddProduitComponent,},
       { path: 'updateProduit/:id', component: AddProduitComponent,},
-      { path: 'commande', component: CommandeComponent },
+      { path: 'commandes', component: CommandeComponent },
       { path: 'promotion', component: PromotionComponent },
+      { path: 'livraison', component: LivraisonComponent, },
+      { path: 'paiements', component: PaiementComponent, },
+      { path: 'chats', component: ChatComponent, },
       { path: '', redirectTo: 'categorie', pathMatch: 'full' }
     ]
   },
@@ -49,8 +63,10 @@ export const routes: Routes = [
     children: [
       { path: 'catalogue', component: CatalogueComponent },
       { path: 'commande', component: CommandeComponent },
+      { path: 'mes-commandes', component: CommandeClientComponent },
       { path: 'panier', component: PanierComponent },
-      { path: 'validerCommande', component: ValiderCommandeComponent },  
+      { path: 'validerCommande', component: ValiderCommandeComponent },
+      { path: 'chats', component: ChatComponent, },  
       { path: '', redirectTo: 'catalogue', pathMatch: 'full' }
     ]
   },

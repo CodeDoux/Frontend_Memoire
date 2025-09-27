@@ -1,15 +1,26 @@
 <div class="catalogue-container">
+    <!-- Afficher seulement si au moins une promo est active -->
+  <div class="promo-message" *ngIf="promotionsActives.length > 0">
+    🎉 {{ promotionsActives[0].nom }} : {{ promotionsActives[0].description }}
+    <span class="promo-dates">
+      (Valable du {{ promotionsActives[0].dateDebut | date:'dd/MM/yyyy' }}
+      au {{ promotionsActives[0].dateFin | date:'dd/MM/yyyy' }})
+    </span>
+  </div>
       <div class="catalogue-header">
         <h1>Notre Catalogue</h1>
         <p>Découvrez nos délicieux produits artisanaux</p>
       </div>
+    
 
       <div class="produits-grid" *ngIf="produits.length > 0">
         <div class="produit-card" *ngFor="let produit of produits">
           <div class="produit-image">
-            <img [src]="'http://127.0.0.1:8000/storage/' + produit.image" 
+            <img [src]="'http://127.0.0.1:8000/storage/' + produit.images" 
                  [alt]="produit.nom" 
                  onerror="this.src='assets/images/placeholder.jpg'">
+                 
+                 
             <div class="produit-overlay" *ngIf="panierService.estDansPanier(produit.id)">
               <span class="dans-panier">Dans le panier</span>
             </div>
@@ -54,7 +65,7 @@
           <button class="close-modal" (click)="fermerDetails()">×</button>
         </div>
         <div class="modal-body">
-          <img [src]="'http://127.0.0.1:8000/storage/' + produitSelectionne.image" 
+          <img [src]="'http://127.0.0.1:8000/storage/' + produitSelectionne.images" 
                [alt]="produitSelectionne.nom"
                class="modal-image">
           <div class="modal-details">

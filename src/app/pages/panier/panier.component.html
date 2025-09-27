@@ -20,11 +20,11 @@
       <div class="panier-plein" *ngIf="panierService.getProduits().length > 0">
         <div class="panier-items">
           <div class="item-card" *ngFor="let item of panierService.getProduits()">
-            <div class="item-image">
+            <!-- <div class="item-image">
               <img [src]="'http://127.0.0.1:8000/storage/' + item.produit.image" 
                    [alt]="item.produit.nom"
                    onerror="this.src='assets/images/placeholder.jpg'">
-            </div>
+            </div>-->
             
             <div class="item-details">
               <h3>{{ item.produit.nom }}</h3>

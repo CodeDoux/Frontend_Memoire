@@ -169,7 +169,7 @@ export class ValiderCommandeComponent implements OnInit {
         produit_id: item.produit.id,
         quantite: item.quantite,
         prixU: item.produit.prix,
-        promo_id: null // À implémenter si vous avez des promos
+        promo_id: null 
       })),
       montant_total: this.panierService.getTotal(),
       infos_livraison: {

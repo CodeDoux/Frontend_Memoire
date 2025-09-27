@@ -115,4 +115,7 @@ export class ProduitComponent {
   canAddProduct(): boolean {
     return this.authService.hasRole('ADMIN');
   }
+  cancel(): void {
+  this.router.navigate(['/admin/produit']);
+}
 }
