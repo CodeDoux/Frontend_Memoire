@@ -1,0 +1,311 @@
+<div class="admin-dashboard">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="welcome-section">
+      <h1>Tableau de bord Admin</h1>
+      <p class="date-text">{{ currentDate | date: 'EEEE d MMMM yyyy' }}</p>
+    </div>
+    <div class="admin-actions">
+      <button class="btn-notification" (click)="openNotifications()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+      </button>
+      <div class="admin-profile">
+        <div class="profile-avatar">
+          <span>AD</span>
+        </div>
+        <div class="profile-info">
+          <span class="profile-name">Admin</span>
+          <span class="profile-role">Administrateur</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card" [style.border-left-color]="'#48bb78'">
+      <div class="stat-header">
+        <div class="stat-icon" [style.background]="'linear-gradient(135deg, #48bb78 0%, #38a169 100%)'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 2L7 6M17 2l2 4M3 6h18M5 6l2 14h10l2-14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stat-trend positive">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 12V4M4 8l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>+12%</span>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ stats.orders }}</h3>
+        <p class="stat-label">Commandes en cours</p>
+      </div>
+    </div>
+
+    <div class="stat-card" [style.border-left-color]="'#3b82f6'">
+      <div class="stat-header">
+        <div class="stat-icon" [style.background]="'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stat-trend positive">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 12V4M4 8l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>+8%</span>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ stats.users }}</h3>
+        <p class="stat-label">Utilisateurs actifs</p>
+      </div>
+    </div>
+
+    <div class="stat-card" [style.border-left-color]="'#f59e0b'">
+      <div class="stat-header">
+        <div class="stat-icon" [style.background]="'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 2L7 6M17 2l2 4M3 6h18M5 6l2 14h10l2-14M10 11v4M14 11v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stat-trend neutral">
+          <span>{{ stats.pendingProducts }} nouveaux</span>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ stats.pendingProducts }}</h3>
+        <p class="stat-label">Produits à valider</p>
+      </div>
+    </div>
+
+    <div class="stat-card" [style.border-left-color]="'#8b5cf6'">
+      <div class="stat-header">
+        <div class="stat-icon" [style.background]="'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stat-trend positive">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 12V4M4 8l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>+5%</span>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ stats.deliveries }}</h3>
+        <p class="stat-label">Livraisons en cours</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-section">
+    <h2 class="section-title">Actions rapides</h2>
+    <div class="quick-actions-grid">
+      <button class="action-card" routerLink="/admin/produit" *ngIf="stats.pendingProducts > 0">
+        <div class="action-icon pending">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M16 4v24M8 12l8-8 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="action-badge">{{ stats.pendingProducts }}</span>
+        </div>
+        <h3>Valider les produits</h3>
+        <p>{{ stats.pendingProducts }} produit(s) en attente</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/commandes">
+        <div class="action-icon orders">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M10 4L6 10M26 4l-4 6M4 10h24M6 10l3 18h14l3-18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Gérer les commandes</h3>
+        <p>{{ stats.orders }} commandes actives</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/livraisons">
+        <div class="action-icon delivery">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M20 8h6l4 4v6h-4M2 18h4M12 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM26 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 18h4v-8H4v8h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Suivre les livraisons</h3>
+        <p>{{ stats.deliveries }} en cours</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/promotions">
+        <div class="action-icon promo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M26 10l-10 10M22 6l4 4-16 16-8-8 16-16 4 4zM6 22l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Gérer les promotions</h3>
+        <p>{{ stats.pendingPromos }} à valider</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/utilisateurs">
+        <div class="action-icon users">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M22 28v-4a6 6 0 0 0-6-6H8a6 6 0 0 0-6 6v4M16 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM28 28v-4a6 6 0 0 0-4.5-5.8M20 2.2a6 6 0 0 1 0 11.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Gérer les utilisateurs</h3>
+        <p>{{ stats.users }} utilisateurs</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/avis">
+        <div class="action-icon reviews">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M16 2l4 8 8 2-6 6 2 8-8-4-8 4 2-8-6-6 8-2 4-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Modérer les avis</h3>
+        <p>{{ stats.pendingReviews }} nouveaux avis</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/categories">
+        <div class="action-icon categories">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M4 4h8v8H4zM4 20h8v8H4zM20 4h8v8h-8zM20 20h8v8h-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Gérer les catégories</h3>
+        <p>{{ stats.categories }} catégories</p>
+      </button>
+
+      <button class="action-card" routerLink="/admin/statistiques">
+        <div class="action-icon stats">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+            <path d="M4 20v8M12 12v16M20 6v22M28 2v26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Statistiques</h3>
+        <p>Vue d'ensemble complète</p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="content-grid">
+    <!-- Recent Orders -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3>Commandes récentes</h3>
+        <button class="btn-see-all" routerLink="/admin/commandes">Voir tout</button>
+      </div>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of recentOrders">
+              <td class="order-id">#{{ order.id }}</td>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar-small">MP</div>
+                  <span>{{ order.user?.nomComplet }}</span>
+                </div>
+              </td>
+              <td class="amount">{{ order.montant_total }} Fr</td>
+              <td>
+                <span class="status-badge" [ngClass]="order.statut">
+                  {{ getStatusLabel(order.statut) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-action" (click)="viewOrder(order.id)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Products Pending Validation -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3>Produits en attente</h3>
+        <button class="btn-see-all" routerLink="/admin/produits/validation">Voir tout</button>
+      </div>
+      <div class="pending-products-list">
+        <div class="pending-product-item" *ngFor="let product of pendingProducts">
+          <div class="product-mini">
+            <img [src]="getImageUrl(product.images[0].chemin)" [alt]="product.nom">
+          </div>
+          <div class="product-mini-info">
+            <h4>{{ product.nom }}</h4>
+            <p>Par {{ product.producteur?.entreprise }}</p>
+            <span class="product-price">{{ product.prix }} Fr</span>
+          </div>
+          <div class="product-mini-actions">
+            <button class="btn-validate" (click)="validateProduct(product.id)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M13 4L6 11l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="btn-reject" (click)="rejectProduct(product.id)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Évolution des ventes</h3>
+        <select class="chart-period">
+          <option value="7">7 derniers jours</option>
+          <option value="30" selected>30 derniers jours</option>
+          <option value="90">90 derniers jours</option>
+        </select>
+      </div>
+      <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+
+    <!--<div class="chart-card">
+      <div class="card-header">
+        <h3>Catégories populaires</h3>
+      </div>
+      <div class="categories-list">
+        <div class="category-item" *ngFor="let cat of topCategories">
+          <div class="category-info">
+            <span class="category-icon">{{ cat.icon }}</span>
+            <span class="category-name">{{ cat.name }}</span>
+          </div>
+          <div class="category-stats">
+            <span class="category-count">{{ cat.count }} ventes</span>
+            <div class="category-bar">
+             <!-- <div class="category-bar-fill" [style.width.%]="cat.percentage"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>-->
+  </div>
+</div>

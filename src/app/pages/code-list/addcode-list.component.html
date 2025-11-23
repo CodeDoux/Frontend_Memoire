@@ -1,0 +1,22 @@
+<form action="" [formGroup]="codelistForm" (ngSubmit)="onSubmit()">
+    
+    <label for="type" >Type</label>
+    <input type="text" id="type" name="type" class="form-control" formControlName="type">
+    <div *ngIf="f2['type'].errors">
+        <span class="text-danger" *ngIf="submetted && f2['type'].errors['required']">le type est obligatoire</span>
+    </div>
+
+    <label for="value" >Value</label>
+    <input type="text" id="value" name="value" class="form-control" formControlName="value">
+    <div *ngIf="f2['value'].errors">
+        <span class="text-danger" *ngIf="submetted && f2['value'].errors['required']">le Value est obligatoire</span>
+    </div>
+    
+    <label for="description" >Description</label>
+    <textarea name="description" id="description" class="form-control" formControlName="description"></textarea>
+    <div *ngIf="f2['description'].errors">
+        <span class="text-danger" *ngIf="submetted && f2['description'].errors['required']">la description est obligatoire</span>
+    </div>
+
+    <button class="btn btn-primary" type="submit" >{{this.id ? "Modifier" : "Enregistrer"}}</button>
+</form>

@@ -39,7 +39,7 @@ export class CategorieService {
 
   // Méthodes utilitaires pour vérifier les permissions
   canManageCategories(): boolean {
-    return this.authService.hasRole('ADMIN');
+    return this.authService.hasRole('ADMIN') || this.authService.hasRole('PRO');
   }
 
   canViewCategories(): boolean {

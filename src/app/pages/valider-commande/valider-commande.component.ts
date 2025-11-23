@@ -21,18 +21,20 @@ export class ValiderCommandeComponent implements OnInit {
   infosLivraison = {
     nomComplet: '',
     telephone: '',
-    adresse: '',
+    rue: '',
     ville: '',
+    quartier:'',
     fraisLivraison: 0,
     codePostal: '',
-    commentaires: ''
+    commentaires: '',
+    zoneLivraison: ''
   };
 
   // Informations de paiement
   infosPaiement = {
-    modePaiement: 'livraison', // 'livraison' ou 'enligne'
+    modePaiement: 'EN_ESPECE', // 'livraison' ou 'enligne'
     numeroTelephone: '', // Pour paiement mobile money
-    operateur: 'orange' // 'orange', 'mtn', 'moov'
+    operateur: '' // 'orange', 'mtn', 'moov'
   };
 
   zonesLivraison = [
@@ -99,7 +101,7 @@ export class ValiderCommandeComponent implements OnInit {
   }
 
   validerInfosLivraison(): boolean {
-    const required = ['nomComplet', 'telephone', 'adresse', 'ville'];
+    const required = ['nomComplet', 'telephone', 'ville','quartier'];
     const manquant = required.find(field => 
       !this.infosLivraison[field as keyof typeof this.infosLivraison]
     );
@@ -120,7 +122,7 @@ export class ValiderCommandeComponent implements OnInit {
   }
 
   validerInfosPaiement(): boolean {
-    if (this.infosPaiement.modePaiement === 'enligne') {
+    if (this.infosPaiement.modePaiement === 'EN_LIGNE') {
       if (!this.infosPaiement.numeroTelephone?.trim()) {
         this.error = 'Veuillez saisir votre numéro de téléphone pour le paiement mobile money';
         return false;
@@ -168,7 +170,7 @@ export class ValiderCommandeComponent implements OnInit {
       produits: produitsPanier.map(item => ({
         produit_id: item.produit.id,
         quantite: item.quantite,
-        prixU: item.produit.prix,
+        prix: item.produit.prix,
         promo_id: null 
       })),
       montant_total: this.panierService.getTotal(),
@@ -176,16 +178,18 @@ export class ValiderCommandeComponent implements OnInit {
         ...this.infosLivraison,
         nomComplet: this.infosLivraison.nomComplet.trim(),
         telephone: this.infosLivraison.telephone.trim(),
-        adresse: this.infosLivraison.adresse.trim(),
+        rue: this.infosLivraison.rue.trim(),
         ville: this.infosLivraison.ville.trim(),
+        quartier: this.infosLivraison.quartier.trim(),
         codePostal: this.infosLivraison.codePostal.trim(),
-        commentaires: this.infosLivraison.commentaires.trim()
+        commentaires: this.infosLivraison.commentaires.trim(),
+        zoneLivraison:this.infosLivraison.zoneLivraison.trim()
       },
       infos_paiement: {
         ...this.infosPaiement,
         numeroTelephone: this.infosPaiement.numeroTelephone.trim()
       },
-      statut: 'en_préparation'
+      statut: 'EN_ATTENTE'
     };
 
     console.log('Données commande à envoyer:', commandeData);
@@ -198,7 +202,7 @@ export class ValiderCommandeComponent implements OnInit {
         this.panierService.viderPanier();
         
         // Rediriger vers la liste des commandes du client avec message de succès
-        this.router.navigate(['/client/commandes'], {
+        this.router.navigate(['/client/commande'], {
           queryParams: { 
             success: 'Votre commande a été passée avec succès! Vous recevrez une confirmation par téléphone.',
             commandeId: response.commande?.id || response.id
@@ -242,8 +246,9 @@ export class ValiderCommandeComponent implements OnInit {
       'nom': 'Nom',
       'prenom': 'Prénom', 
       'telephone': 'Téléphone',
-      'adresse': 'Adresse',
-      'ville': 'Ville'
+      'rue': 'rue',
+      'ville': 'Ville',
+      'quartier':'quartier',
     };
     return labels[field] || field;
   }
@@ -281,6 +286,7 @@ onZoneChange(event: Event) {
   if (zone) {
     if (zone.tarif > 0) {
       this.infosLivraison.fraisLivraison = zone.tarif;
+      this.infosLivraison.zoneLivraison = zone.nom;
     } else {
       // Tarif personnalisé → on laisse l’utilisateur saisir
       this.infosLivraison.fraisLivraison = 0;
@@ -291,6 +297,9 @@ onZoneChange(event: Event) {
 // Quand l’utilisateur saisit un frais personnalisé
 onFraisLivraisonChange(frais: number) {
   this.infosLivraison.fraisLivraison = frais > 0 ? frais : 0;
+}
+onZoneLivraisonChange(nom: string) {
+  this.infosLivraison.zoneLivraison = nom ? nom : '';
 }
 
 // --- PROMOTIONS / CALCULS ---

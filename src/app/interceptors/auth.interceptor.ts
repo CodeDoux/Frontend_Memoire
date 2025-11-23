@@ -2,13 +2,19 @@ import { HttpErrorResponse, HttpHeaders, HttpInterceptorFn } from '@angular/comm
 import { inject } from '@angular/core';
 import { Router } from '@angular/router'; 
 import { catchError, throwError } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-
+  const platformId = inject(PLATFORM_ID);
+  let token: string | null = null;
   // Récupérer le token
-  const token = localStorage.getItem('token');
+  if (isPlatformBrowser(platformId)) {
+    // ✅ On est bien dans un navigateur, donc localStorage est disponible
+    token = localStorage.getItem('token');
+  }
 
   // Si pas de token, passer la requête sans modification
   if (!token) {

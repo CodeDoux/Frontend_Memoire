@@ -1,0 +1,48 @@
+<body>
+  <div class="container users-container">
+    <div class="header">
+      <h1>Gestion des Producteurs</h1>
+    </div>
+
+    <div class="controls mb-3 d-flex justify-content-between align-items-center">
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Rechercher un utilisateur..." id="searchInput">
+      </div>
+      <a class="btn btn-add" routerLink="/admin/addProducteur">
+        <i class="fas fa-plus me-1"></i> Ajouter un utilisateur
+      </a>
+    </div>
+
+    <div class="table-container">
+      <table class="table table-users">
+        <thead>
+          <tr>
+            <th>Nom Complet</th>
+            <th>Email</th>
+            <th>Entreprise</th>
+            <th>Description</th>
+            <th>Ninea</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pro of producteurs">
+            <td>{{pro.utilisateur.nomComplet}}</td>
+            <td>{{pro.utilisateur.email}}</td>
+            <td>{{pro.entreprise}}</td>
+            <td>{{pro.description}}</td>
+            <td>{{pro.ninea}}</td>
+            <td class="actions-cell">
+              <button class="btn btn-edit" routerLink="/admin/updatePro/{{pro.id}}">
+                <i class="fas fa-edit me-1"></i> Modifier
+              </button>
+              <button class="btn btn-delete" (click)="supprimerProducteur(pro.id!)">
+                <i class="fas fa-trash me-1"></i> Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

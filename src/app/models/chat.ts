@@ -1,7 +1,9 @@
 export class Chat {
-    client_id! : number;
-    employe_id! : number;
-    message! : string;
-    est_lu! : boolean;
-    emeteur! : 0|1;
+    id?: number;
+  client_id!: number;
+  employe_id!: number;
+  message!: string;
+  est_lu?: boolean;
+  emeteur!: number; 
+  created_at?: string;
 }

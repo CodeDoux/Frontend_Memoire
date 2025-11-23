@@ -21,10 +21,11 @@ export class PanierComponent implements OnInit{
 
   ngOnInit() {
     console.log('PanierComponent chargé');
+    console.log(this.panierService.getProduits());
   }
 
   allerAuCatalogue() {
-    this.router.navigate(['/client/catalogue']);
+    this.router.navigate(['catalogue']);
   }
 
   augmenterQuantite(produitId: number) {

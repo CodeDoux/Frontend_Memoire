@@ -1,178 +1,309 @@
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <i class="bi bi-box"></i>
-            {{ isEditMode ? 'Modifier le produit' : 'Ajouter un produit' }}
-          </h3>
-        </div>
-        <div class="card-body">
-          <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <!-- Nom du produit -->
-            <div class="mb-3">
-              <label for="nom" class="form-label">Nom du produit *</label>
-              <input 
-                formControlName="nom" 
-                type="text" 
-                id="nom" 
-                class="form-control"
-                [class.is-invalid]="form.get('nom')?.invalid && form.get('nom')?.touched"
-                placeholder="Entrez le nom du produit">
-              <div class="invalid-feedback">
-                Le nom est requis (minimum 2 caractères).
-              </div>
-            </div>
-<!-- Saison du produit -->
-            <div class="mb-3">
-              <label for="saison" class="form-label">Saison du produit *</label>
-              <input 
-                formControlName="saison" 
-                type="text" 
-                id="saison" 
-                class="form-control"
-                [class.is-invalid]="form.get('saison')?.invalid && form.get('saison')?.touched"
-                placeholder="Entrez la saison du produit">
-              <div class="invalid-feedback">
-                Le saison est requis (minimum 2 caractères).
-              </div>
-            </div>
 
-            <!-- Description -->
-            <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
-              <textarea 
-                formControlName="description" 
-                id="description" 
-                class="form-control" 
-                rows="3"
-                placeholder="Description du produit (optionnel)"></textarea>
-            </div>
+<div class="add-product-page">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" routerLink="producteur/produit/">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M15 10H5M10 5l-5 5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Retour à mes produits
+    </button>
+    <div class="header-info">
+      <h1>Ajouter un nouveau produit</h1>
+      <p class="subtitle">Remplissez les informations ci-dessous pour ajouter un produit à votre catalogue</p>
+    </div>
+  </div>
 
-            <!-- Prix -->
-            <div class="mb-3">
-              <label for="prix" class="form-label">Prix (F Cfa) *</label>
-              <input 
-                formControlName="prix" 
-                type="number" 
-                step="0.01"
-                min="0"
-                id="prix" 
-                class="form-control"
-                [class.is-invalid]="form.get('prix')?.invalid && form.get('prix')?.touched"
-                placeholder="0">
-              <div class="invalid-feedback">
-                Le prix est requis et doit être positif.
-              </div>
-            </div>
+  <!-- Alert Info -->
+  <div class="alert-info">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+      <circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <strong>Important :</strong> Votre produit sera soumis à validation par un administrateur avant d'être visible sur la plateforme.
+    </div>
+  </div>
 
-            <!-- Stock -->
-            <div class="mb-3">
-              <label for="stock" class="form-label">Stock *</label>
-              <input 
-                formControlName="stock" 
-                type="number" 
-                min="0"
-                id="stock" 
-                class="form-control"
-                [class.is-invalid]="form.get('stock')?.invalid && form.get('stock')?.touched"
-                placeholder="0">
-              <div class="invalid-feedback">
-                Le stock est requis et doit être positif.
-              </div>
-            </div>
-            <!-- note -->
-            <div class="mb-3">
-              <label for="note" class="form-label">note *</label>
-              <input 
-                formControlName="note" 
-                type="number" 
-                min="0"
-                id="note" 
-                class="form-control"
-                [class.is-invalid]="form.get('note')?.invalid && form.get('note')?.touched"
-                placeholder="0">
-              <div class="invalid-feedback">
-                Le note est requis et doit être positif.
-              </div>
-            </div>
-            <!-- poids -->
-            <div class="mb-3">
-              <label for="poids" class="form-label">poids du produit *</label>
-              <input 
-                formControlName="poids" 
-                type="text" 
-                id="poids" 
-                class="form-control"
-                [class.is-invalid]="form.get('poids')?.invalid && form.get('poids')?.touched"
-                placeholder="Entrez le poids du produit">
-              <div class="invalid-feedback">
-                Le poids est requis .
-              </div>
-            </div>
+  <!-- Form Container -->
+  <form class="form-container" (ngSubmit)="onSubmit()" #productForm="ngForm">
+    <div class="form-layout">
+      <!-- Left Column - Form Fields -->
+      <div class="form-section">
+        <div class="section-card">
+          <h2 class="section-title">
+            <span class="title-icon">📝</span>
+            Informations générales
+          </h2>
 
-            <!-- Image -->
-            <div class="mb-3">
-  <label for="images" class="form-label">Images</label>
-  <input
-    type="file"
-    id="images"
-    class="form-control"
-    (change)="onFilesSelected($event)"
-    accept="image/*"
-    multiple
-  >
-</div>
+          <!-- Product Name -->
+          <div class="form-group">
+            <label class="form-label required">Nom du produit</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Ex: Tomates bio"
+              [(ngModel)]="productData.name"
+              name="name"
+              required>
+            <span class="help-text">Donnez un nom clair et descriptif à votre produit</span>
+          </div>
 
-<!-- Aperçu des images sélectionnées -->
-<div *ngFor="let img of selectedImages; let i = index" class="mt-2">
-  <img [src]="img.preview" alt="Aperçu" width="100">
-  <button type="button" (click)="removeImage(i)">Supprimer</button>
-</div>
-
-
-            <!-- Catégorie -->
-            <div class="mb-3">
-              <label for="categorie_id" class="form-label">Catégorie *</label>
-              <select 
-                formControlName="categorie_id" 
-                id="categorie_id" 
-                class="form-select"
-                [class.is-invalid]="form.get('categorie_id')?.invalid && form.get('categorie_id')?.touched">
-                <option value="">Sélectionnez une catégorie</option>
-                <option 
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label required">Catégorie</label>
+            <select 
+              class="form-control" 
+              [(ngModel)]="productData.category"
+              name="category"
+              required>
+              <option value="">Sélectionnez une catégorie</option>
+              <option 
                   *ngFor="let categorie of categories" 
                   [value]="categorie.id">
                   {{ categorie.nom }}
                 </option>
-              </select>
-              <div class="invalid-feedback">
-                Veuillez sélectionner une catégorie.
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label required">Description</label>
+            <textarea 
+              class="form-control" 
+              rows="4"
+              placeholder="Décrivez votre produit, son origine, ses qualités..."
+              [(ngModel)]="productData.description"
+              name="description"
+              required></textarea>
+            <div class="char-counter">
+              {{ productData.description.length }} / 500 caractères
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="section-card">
+          <h2 class="section-title">
+            <span class="title-icon">💰</span>
+            Prix et conditionnement
+          </h2>
+
+          <div class="form-row">
+            <!-- Price -->
+            <div class="form-group">
+              <label class="form-label required">Prix</label>
+              <div class="input-with-icon">
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  placeholder="0"
+                  [(ngModel)]="productData.price"
+                  name="price"
+                  min="0"
+                  required>
+                <span class="input-icon">Fr</span>
               </div>
             </div>
 
-            <!-- Boutons -->
-            <div class="d-flex justify-content-between">
-              <button 
-                type="button" 
-                class="btn btn-secondary"
-                routerLink="/admin/produit">
-                <i class="bi bi-arrow-left"></i> Retour
-              </button>
-              
-              <button 
-                type="submit" 
-                class="btn btn-primary"
-                [disabled]="form.invalid || isLoading">
-                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                <i *ngIf="!isLoading" class="bi" [class.bi-plus-circle]="!isEditMode" [class.bi-check-circle]="isEditMode"></i>
-                {{ isEditMode ? 'Modifier' : 'Ajouter' }}
-              </button>
+            <!-- Unit -->
+            <div class="form-group">
+              <label class="form-label required">Unité</label>
+              <select 
+                class="form-control" 
+                [(ngModel)]="productData.unit"
+                name="unit"
+                required>
+                <option value="">Unité</option>
+                <option value="kg">Kilogramme (kg)</option>
+                <option value="g">Gramme (g)</option>
+                <option value="l">Litre (L)</option>
+                <option value="piece">Pièce</option>
+                <option value="botte">Botte</option>
+                <option value="paquet">Paquet</option>
+              </select>
             </div>
-          </form>
+          </div>
+
+          <!-- Weight/Quantity -->
+          <div class="form-group">
+            <label class="form-label required">Poids/Quantité</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Ex: 1 kg, 500 g, 1 pièce"
+              [(ngModel)]="productData.weight"
+              name="weight"
+              required>
+          </div>
+
+          <!-- Stock -->
+          <div class="form-group">
+            <label class="form-label required">Stock disponible</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              placeholder="Quantité en stock"
+              [(ngModel)]="productData.stock"
+              name="stock"
+              min="0"
+              required>
+            <span class="help-text">Nombre d'unités disponibles à la vente</span>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="section-card">
+          <h2 class="section-title">
+            <span class="title-icon">🌱</span>
+            Informations complémentaires
+          </h2>
+
+          <!-- Origin -->
+          <div class="form-group">
+            <label class="form-label">Origine</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Ex: Ferme de Pikine"
+              [(ngModel)]="productData.origin"
+              name="origin">
+          </div>
+
+          <!-- Certifications -->
+          <div class="form-group">
+            <label class="form-label">Certifications</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="productData.isBio"
+                  name="isBio">
+                <span class="checkbox-text">
+                  <strong>Bio</strong> - Produit issu de l'agriculture biologique
+                </span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="productData.isLocal"
+                  name="isLocal">
+                <span class="checkbox-text">
+                  <strong>100% Local</strong> - Produit et cultivé localement
+                </span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="productData.isSeasonal"
+                  name="isSeasonal">
+                <span class="checkbox-text">
+                  <strong>De saison</strong> - Produit de saison actuellement disponible
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Image Upload -->
+      <div class="form-section">
+        <div class="section-card sticky-card">
+          <h2 class="section-title">
+            <span class="title-icon">📷</span>
+            Images du produit
+          </h2>
+
+          <!-- Main Image Upload -->
+          <div class="image-upload-container">
+            <div class="main-image-area" *ngIf="!productData.mainImage" (click)="mainImageInput.click()">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <path d="M24 8v32M8 24h32" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <p class="upload-text">Ajouter une image principale</p>
+              <p class="upload-hint">PNG, JPG jusqu'à 5MB</p>
+              <input 
+                type="file" 
+                #mainImageInput
+                accept="image/*"
+                (change)="onMainImageSelect($event)"
+                hidden>
+            </div>
+
+            <div class="image-preview" *ngIf="productData.mainImage">
+              <img [src]="productData.mainImage" alt="Image principale">
+              <button class="btn-remove-image" type="button" (click)="removeMainImage()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <div class="image-badge">Image principale</div>
+            </div>
+          </div>
+
+          <!-- Additional Images -->
+          <div class="additional-images">
+            <label class="form-label">Images supplémentaires (optionnel)</label>
+            <div class="images-grid">
+              <div 
+                class="small-image-upload" 
+                *ngFor="let img of productData.additionalImages; let i = index">
+                <img [src]="img" alt="Image {{ i + 1 }}">
+                <button class="btn-remove-small" type="button" (click)="removeAdditionalImage(i)">
+                  ×
+                </button>
+              </div>
+              <div 
+                class="small-image-upload add-more" 
+                *ngIf="productData.additionalImages.length < 4"
+                (click)="additionalImageInput.click()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <input 
+                  type="file" 
+                  #additionalImageInput
+                  accept="image/*"
+                  (change)="onAdditionalImageSelect($event)"
+                  hidden>
+              </div>
+            </div>
+            <span class="help-text">Maximum 4 images supplémentaires</span>
+          </div>
+
+          <!-- Preview Card -->
+          <div class="preview-card" *ngIf="productData.name">
+            <h3 class="preview-title">Aperçu</h3>
+            <div class="product-preview">
+              <div class="preview-image">
+                <img [src]="productData.mainImage || 'assets/images/placeholder.jpg'" alt="Aperçu">
+                <span class="preview-badge" *ngIf="productData.isBio">Bio</span>
+              </div>
+              <div class="preview-info">
+                <h4>{{ productData.name || 'Nom du produit' }}</h4>
+                <p class="preview-weight">{{ productData.weight || '1 kg' }}</p>
+                <div class="preview-footer">
+                  <span class="preview-price">{{ productData.price || 0 }} Fr</span>
+                  <span class="preview-status pending">En attente</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" routerLink="producteur/produit/">
+        Annuler
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="!productForm.form.valid">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M16 5L7 14l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Ajouter le produit
+      </button>
+    </div>
+  </form>
 </div>

@@ -1,68 +1,40 @@
 <!-- admin-dashboard.component.html -->
  
-<div class="admin-layout">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/admin">Admin Dashboard</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbarAdmin" *ngIf="isAdmin()">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="utilisateur" routerLinkActive="active">
-            <i class="bi bi-tags me-2"></i>Users
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="categorie" routerLinkActive="active">
-            <i class="bi bi-tags me-2"></i>Catégories
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="produit" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>Produits
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="commandes" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>Commandes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="promotion" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>Promotion
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="paiements" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>Paiements
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="livraison" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>Livraison
-          </a>
-        </li>
-         <li class="nav-item">
-          <a class="nav-link" routerLink="chats" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>chats
-          </a>
-        </li>
-      </ul>
-
-      <span class="navbar-text text-white me-3">
-        {{ currentUser?.nomComplet }} ({{ currentUser?.role }})
-      </span>
-      <button class="btn btn-outline-light btn-sm" (click)="logout()">
-        <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
-      </button>
-    </div>
+<!-- Sidebar -->
+<div class="sidebar">
+  <!-- Tableau de bord -->
+  <div class="nav-item" routerLink="/admin/acceuilAdmin" routerLinkActive="active" >
+    <a>
+      <span class="icon">🏠</span>
+      <span>Dashboard</span>
+    </a>
   </div>
-</nav>
+   <!-- Parametre -->
+  <div class="nav-item" routerLink="" routerLinkActive="active">
+    <a>
+      <span class="icon">📅</span>
+      <span>Parametres</span>
+    </a>
+  </div>
+
+  <!-- Profil -->
+  <div class="nav-item" routerLink="" routerLinkActive="active">
+    <a>
+      <span class="icon">👤</span>
+      <span>Profil</span>
+    </a>
+  </div>
+  <button class="btn-logout" (click)="logout()">
+      <span class="logout-icon">🚪</span>
+      Déconnexion
+    </button>
 </div>
 <div class="container mt-4">
   <router-outlet></router-outlet>
 </div>
+<!-- Footer -->
+  <div class="footer">
+    <p>© 2025 Circuit Court | Plateforme de vente directe producteurs | Soutenez les agriculteurs locaux</p>
+  </div>
 

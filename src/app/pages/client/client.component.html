@@ -1,0 +1,32 @@
+  
+      <h1>Gestion des clients</h1>
+      <a class="btn btn-add" routerLink="/admin/addClient">
+        <i class="fas fa-plus me-1"></i> Ajouter un client
+      </a>
+   
+      <table class="table table-users">
+        <thead>
+          <tr>
+            <th>Nom Complet</th>
+            <th>Email</th>
+            <th>Tel</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of clients">
+            <td>{{client.user.nomComplet}}</td>
+            <td>{{client.user.email}}</td>
+            <td>{{client.user.tel}}</td>
+            <td class="actions-cell">
+              <button class="btn btn-edit" routerLink="/admin/updateClient/{{client.id}}">
+                <i class="fas fa-edit me-1"></i> Modifier
+              </button>
+              <button class="btn btn-delete" (click)="deleteclient(client.id)">
+                <i class="fas fa-trash me-1"></i> Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+   

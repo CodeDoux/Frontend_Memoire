@@ -33,13 +33,13 @@
           <td>
             <span class="statut-badge"
                   [ngClass]="{
-                    'statut-payee': paiement.statut === 'payée'
+                    'statut-payee': paiement.statut === 'PAYEE'
                   }">
               {{ paiement.statut | titlecase }}
             </span>
           </td>
           <td class="actions-cell">
-            <button *ngIf="paiement.statut !== 'payée'" class="action-btn btn-paye" >
+            <button *ngIf="paiement.statut !== 'PAYEE'" class="action-btn btn-paye" >
               <i class="fas fa-check-circle"></i> Non_Payée
             </button>
             <button  class="action-btn btn-annulee" >

@@ -20,11 +20,11 @@
       <div class="panier-plein" *ngIf="panierService.getProduits().length > 0">
         <div class="panier-items">
           <div class="item-card" *ngFor="let item of panierService.getProduits()">
-            <!-- <div class="item-image">
-              <img [src]="'http://127.0.0.1:8000/storage/' + item.produit.image" 
+            <div class="item-image">
+              <img [src]="'http://127.0.0.1:8000/storage/' + item.produit.images" 
                    [alt]="item.produit.nom"
-                   onerror="this.src='assets/images/placeholder.jpg'">
-            </div>-->
+                   onerror="this.src='../../../assets/images/ferme.jpg'">
+            </div>
             
             <div class="item-details">
               <h3>{{ item.produit.nom }}</h3>
@@ -52,7 +52,7 @@
         </div>
 
         <!-- Résumé du panier -->
-        <div class="panier-summary">
+       <div class="panier-summary">
           <div class="summary-card">
             <h3>Récapitulatif</h3>
             
@@ -70,7 +70,7 @@
             
             <div class="summary-total">
               <span>Total</span>
-              <span class="total-price">{{ panierService.getTotal()}} cfca</span>
+             <span class="total-price">{{ panierService.getTotal()}} cfca</span>
             </div>
             
             <div class="summary-actions">

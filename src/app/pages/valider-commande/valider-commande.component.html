@@ -151,9 +151,14 @@
                         <input type="tel" id="telephone" [(ngModel)]="infosLivraison.telephone" required>
                     </div>
 
+                    <label >Adresse complète *</label>
                     <div class="form-group">
-                        <label for="adresse">Adresse complète *</label>
-                        <input type="text" id="adresse" [(ngModel)]="infosLivraison.adresse" required>
+                        <label for="rue">rue</label>
+                        <input type="text" id="rue" [(ngModel)]="infosLivraison.rue" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quartier">quartier</label>
+                        <input type="text" id="quartier" [(ngModel)]="infosLivraison.quartier" required>
                     </div>
 
                     <div class="form-group">
@@ -167,7 +172,7 @@
                         <div class="zone-livraison-grid">
                             <select (change)="onZoneChange($event)">
                                 <option value="">Sélectionnez une zone</option>
-                                <option *ngFor="let zone of zonesLivraison" [value]="zone.nom">
+                                <option *ngFor="let zone of zonesLivraison" [value]="zone.nom" >
                                     {{ zone.nom }} - {{ zone.tarif > 0 ? (zone.tarif | number:'1.0-0') + ' FCFA' : 'Tarif personnalisé' }}
                                 </option>
                             </select>
@@ -180,6 +185,14 @@
                                        (ngModelChange)="onFraisLivraisonChange($event)"
                                        min="0"
                                        step="500">
+                            </div>
+                            <div class="frais-personnalises">
+                                <label for="zoneLivraison">Zone de Livraison</label>
+                                <input type="text" 
+                                       id="zoneLivraison"
+                                       [(ngModel)]="infosLivraison.zoneLivraison"
+                                       (ngModelChange)="onZoneLivraisonChange($event)"
+                                       >
                             </div>
                         </div>
                     </div>
@@ -200,10 +213,10 @@
 
                     <div class="paiement-options">
                         <div class="paiement-option" 
-                             [class.selected]="infosPaiement.modePaiement === 'livraison'"
-                             (click)="infosPaiement.modePaiement = 'livraison'">
+                             [class.selected]="infosPaiement.modePaiement === 'EN_ESPECE'"
+                             (click)="infosPaiement.modePaiement = 'EN_ESPECE'">
                             <div class="paiement-option-header">
-                                <input type="radio" name="modePaiement" value="livraison" 
+                                <input type="radio" name="modePaiement" value="EN_ESPECE" 
                                        [(ngModel)]="infosPaiement.modePaiement">
                                 <i class="fas fa-money-bill-wave" style="color: #27ae60; font-size: 1.5rem;"></i>
                                 <div class="paiement-option-titre">Paiement à la livraison</div>
@@ -214,10 +227,10 @@
                         </div>
 
                         <div class="paiement-option" 
-                             [class.selected]="infosPaiement.modePaiement === 'enligne'"
-                             (click)="infosPaiement.modePaiement = 'enligne'">
+                             [class.selected]="infosPaiement.modePaiement === 'EN_LIGNE'"
+                             (click)="infosPaiement.modePaiement = 'EN_LIGNE'">
                             <div class="paiement-option-header">
-                                <input type="radio" name="modePaiement" value="enligne" 
+                                <input type="radio" name="modePaiement" value="EN_LIGNE" 
                                        [(ngModel)]="infosPaiement.modePaiement">
                                 <i class="fas fa-mobile-alt" style="color: #3498db; font-size: 1.5rem;"></i>
                                 <div class="paiement-option-titre">Paiement Mobile Money</div>
@@ -226,7 +239,7 @@
                                 Payez directement par Orange Money, MTN Money ou Moov Money
                             </div>
 
-                            <div *ngIf="infosPaiement.modePaiement === 'enligne'">
+                            <div *ngIf="infosPaiement.modePaiement === 'EN_LIGNE'">
                                 <div class="form-group" style="margin-top: 15px;">
                                     <label for="numeroTelephone">Numéro de téléphone *</label>
                                     <input type="tel" id="numeroTelephone" 
@@ -237,19 +250,19 @@
                                     <label>Choisissez votre opérateur</label>
                                     <div class="operateurs-grid">
                                         <div class="operateur-option" 
-                                             [class.selected]="infosPaiement.operateur === 'orange'"
-                                             (click)="infosPaiement.operateur = 'orange'">
+                                             [class.selected]="infosPaiement.operateur === 'ORANGE_MONEY'"
+                                             (click)="infosPaiement.operateur = 'ORANGE_MONEY'">
                                             <div style="color: #ff6600; font-weight: bold;">Orange Money</div>
                                         </div>
                                         <div class="operateur-option" 
-                                             [class.selected]="infosPaiement.operateur === 'mtn'"
-                                             (click)="infosPaiement.operateur = 'mtn'">
-                                            <div style="color: #ffcc00; font-weight: bold;">MTN Money</div>
+                                             [class.selected]="infosPaiement.operateur === 'FREE_MONEY'"
+                                             (click)="infosPaiement.operateur = 'FREE_MONEY'">
+                                            <div style="color: #ffcc00; font-weight: bold;">Free Money</div>
                                         </div>
                                         <div class="operateur-option" 
-                                             [class.selected]="infosPaiement.operateur === 'moov'"
-                                             (click)="infosPaiement.operateur = 'moov'">
-                                            <div style="color: #0066cc; font-weight: bold;">Moov Money</div>
+                                             [class.selected]="infosPaiement.operateur === 'WAVE'"
+                                             (click)="infosPaiement.operateur = 'WAVE'">
+                                            <div style="color: #0066cc; font-weight: bold;">WAVE</div>
                                         </div>
                                     </div>
                                 </div>
@@ -270,7 +283,7 @@
                         <div class="confirmation-details">
                             <h4><i class="fas fa-truck"></i> Livraison</h4>
                             <p><strong>{{ infosLivraison.nomComplet }}</strong></p>
-                            <p>{{ infosLivraison.adresse }}, {{ infosLivraison.ville }}</p>
+                            <p>{{ infosLivraison.ville }}, {{ infosLivraison.rue }},{{ infosLivraison.quartier }}</p>
                             <p>{{ infosLivraison.telephone }}</p>
                             <p *ngIf="infosLivraison.fraisLivraison > 0" class="frais-livraison">
                                 <strong>Frais de livraison:</strong> {{ infosLivraison.fraisLivraison | number:'1.0-0' }} FCFA
@@ -279,10 +292,10 @@
 
                         <div class="confirmation-details">
                             <h4><i class="fas fa-credit-card"></i> Paiement</h4>
-                            <p *ngIf="infosPaiement.modePaiement === 'livraison'">
+                            <p *ngIf="infosPaiement.modePaiement === 'EN_ESPECE'">
                                 <strong>Paiement à la livraison</strong> (Espèces)
                             </p>
-                            <p *ngIf="infosPaiement.modePaiement === 'enligne'">
+                            <p *ngIf="infosPaiement.modePaiement === 'EN_LIGNE'">
                                 <strong>{{ infosPaiement.operateur | titlecase }} Money</strong><br>
                                 {{ infosPaiement.numeroTelephone }}
                             </p>
@@ -384,10 +397,10 @@
 
                     <div class="info-section" *ngIf="etapeActuelle > 2">
                         <h4><i class="fas fa-credit-card"></i> Paiement</h4>
-                        <p class="info-text" *ngIf="infosPaiement.modePaiement === 'livraison'">
+                        <p class="info-text" *ngIf="infosPaiement.modePaiement === 'EN_ESPECE'">
                             À la livraison (Espèces)
                         </p>
-                        <p class="info-text" *ngIf="infosPaiement.modePaiement === 'enligne'">
+                        <p class="info-text" *ngIf="infosPaiement.modePaiement === 'EN_LIGNE'">
                             {{ infosPaiement.operateur | titlecase }} Money
                         </p>
                     </div>

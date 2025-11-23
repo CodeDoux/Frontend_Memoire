@@ -27,8 +27,10 @@ export const roleGuard: CanActivateFn = (route, state) => {
       console.log('RoleGuard - Rôles requis:', requiredRoles);
       
       if (user && requiredRoles.includes(user.role)) {
+        console.log(user.role);
         return true;
       } else {
+        
         console.log('Accès refusé - rôle insuffisant');
         router.navigate(['/unauthorized']);
         return false;

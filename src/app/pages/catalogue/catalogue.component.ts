@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Produit } from '../../models/produit';
 import { PanierService } from '../../services/panier.service';
 import { ProduitService } from '../../services/produit.service';
@@ -6,6 +6,21 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Promotion } from '../../models/promotion';
 import { PromotionService } from '../../services/promotion.service';
+import { ProducteurService } from '../../services/producteur.service';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
+interface Product {
+  id: number;
+  name: string;
+  image: string;
+  weight: string;
+  price: number;
+  isNew: boolean;
+  category: string;
+  producerId: number;
+  producerName: string;
+  producerAvatar: string;
+}
+
 
 @Component({
   selector: 'app-catalogue',
@@ -16,104 +31,259 @@ import { PromotionService } from '../../services/promotion.service';
   templateUrl: './catalogue.component.html',
   styleUrl: './catalogue.component.css'
 })
-export class CatalogueComponent {
-  produits: Produit[] = [];
-  loading: boolean = true;
-  produitSelectionne: Produit | null = null;
-  promotions: Promotion[] = [];
-  promotionsActives: Promotion[] = [];
+export class CatalogueComponent implements OnInit{
+  searchQuery: string = '';
+  cartCount: number = 0;
+   selectedCategory: string = '';
+  displayedProducts: Product[] = [];
+  allProducts: Product[] = [];
+  productsPerPage: number = 12;
+  currentPage: number = 1;
+  totalProducts: number = 0;
+  hasMoreProducts: boolean = true;
+
+  // Tous les produits (exemple)
+  products: Product[] = [
+    {
+      id: 1,
+      name: 'La consommateur',
+      image: 'assets/images/products/potato.jpg',
+      weight: '1 kg',
+      price: 2500,
+      isNew: true,
+      category: 'legumes',
+      producerId: 1,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar1.jpg'
+    },
+    {
+      id: 2,
+      name: 'Gros Sénégalais',
+      image: 'assets/images/products/sweet-potato.jpg',
+      weight: '1 kg',
+      price: 2000,
+      isNew: false,
+      category: 'legumes',
+      producerId: 2,
+      producerName: 'Autre producteur',
+      producerAvatar: 'assets/images/producers/avatar2.jpg'
+    },
+    {
+      id: 3,
+      name: 'Toffe de saison',
+      image: 'assets/images/products/pumpkin.jpg',
+      weight: '1 unité',
+      price: 1500,
+      isNew: false,
+      category: 'legumes',
+      producerId: 1,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar1.jpg'
+    },
+    {
+      id: 4,
+      name: 'Mangue',
+      image: 'assets/images/products/mango.jpg',
+      weight: '1 kg',
+      price: 3000,
+      isNew: true,
+      category: 'fruits',
+      producerId: 3,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar3.jpg'
+    },
+    {
+      id: 5,
+      name: 'Pomme de terre',
+      image: 'assets/images/products/vegetables.jpg',
+      weight: '1 kg',
+      price: 1500,
+      isNew: false,
+      category: 'legumes',
+      producerId: 2,
+      producerName: 'Autre producteur',
+      producerAvatar: 'assets/images/producers/avatar2.jpg'
+    },
+    {
+      id: 6,
+      name: 'Pomme de terre',
+      image: 'assets/images/products/bread.jpg',
+      weight: '1 kg',
+      price: 600,
+      isNew: false,
+      category: 'cereales',
+      producerId: 4,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar4.jpg'
+    },
+    {
+      id: 7,
+      name: 'Oignon',
+      image: 'assets/images/products/onion.jpg',
+      weight: '1 kg',
+      price: 800,
+      isNew: false,
+      category: 'legumes',
+      producerId: 1,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar1.jpg'
+    },
+    {
+      id: 8,
+      name: 'Betrave',
+      image: 'assets/images/products/beetroot.jpg',
+      weight: '1 kg',
+      price: 1500,
+      isNew: false,
+      category: 'legumes',
+      producerId: 2,
+      producerName: 'Autre producteur',
+      producerAvatar: 'assets/images/producers/avatar2.jpg'
+    },
+    {
+      id: 9,
+      name: 'Piment rouge',
+      image: 'assets/images/products/red-pepper.jpg',
+      weight: '500 g',
+      price: 1200,
+      isNew: true,
+      category: 'epices',
+      producerId: 5,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar5.jpg'
+    },
+    {
+      id: 10,
+      name: 'Poivron coloré',
+      image: 'assets/images/products/bell-pepper.jpg',
+      weight: '1 kg',
+      price: 2000,
+      isNew: false,
+      category: 'legumes',
+      producerId: 3,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar3.jpg'
+    },
+    {
+      id: 11,
+      name: 'Ail blanc',
+      image: 'assets/images/products/garlic.jpg',
+      weight: '500 g',
+      price: 900,
+      isNew: false,
+      category: 'epices',
+      producerId: 1,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar1.jpg'
+    },
+    {
+      id: 12,
+      name: 'Haricot sec',
+      image: 'assets/images/products/beans.jpg',
+      weight: '1 kg',
+      price: 1800,
+      isNew: false,
+      category: 'cereales',
+      producerId: 4,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar4.jpg'
+    },
+    {
+      id: 13,
+      name: 'Carotte',
+      image: 'assets/images/products/carrot.jpg',
+      weight: '1 kg',
+      price: 1200,
+      isNew: true,
+      category: 'legumes',
+      producerId: 2,
+      producerName: 'Autre producteur',
+      producerAvatar: 'assets/images/producers/avatar2.jpg'
+    },
+    {
+      id: 14,
+      name: 'Concombre',
+      image: 'assets/images/products/cucumber.jpg',
+      weight: '1 kg',
+      price: 800,
+      isNew: false,
+      category: 'legumes',
+      producerId: 3,
+      producerName: 'Producteur',
+      producerAvatar: 'assets/images/producers/avatar3.jpg'
+    },
+    // Ajoutez plus de produits selon vos besoins
+  ];
 
   constructor(
-    private produitService: ProduitService,
-    public panierService: PanierService,
-    private authService: AuthService,
-    private promotionService: PromotionService
-  ) {}
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
 
-  ngOnInit() {
-    this.promotionService.getAll().subscribe({
-      next: (data) => {
-        this.promotions = data;
-
-        const now = new Date();
-
-        // ✅ Filtrer seulement les promos actives
-        this.promotionsActives = this.promotions.filter(promo => {
-          const debut = new Date(promo.dateDebut);
-          const fin = new Date(promo.dateFin);
-          return debut <= now && now <= fin;
-        });
-      },
-      error: (err) => {
-        console.error("Erreur lors du chargement des promotions :", err);
-      }
-    });
-    this.chargerProduits();
-    console.log(this.promotionsActives);
+  ngOnInit(): void {
+    this.allProducts = [...this.products];
+    this.totalProducts = this.allProducts.length;
+    this.loadProducts();
   }
-    
-
-  chargerProduits() {
-    this.loading = true;
-    
-    // Attendre que l'utilisateur soit chargé, puis charger les produits
-    this.authService.waitForUserLoaded().subscribe({
-      next: (user) => {
-        console.log('Utilisateur pour catalogue:', user);
-        
-        // Utiliser getAllForClient() spécifiquement pour les clients
-        this.produitService.getAllForClient().subscribe({
-          next: (produits) => {
-            this.produits = produits;
-            this.loading = false;
-            console.log('Produits chargés pour client:', produits);
-          },
-          error: (error) => {
-            console.error('Erreur lors du chargement des produits:', error);
-            this.loading = false;
-            
-            // Affichage d'un message d'erreur plus détaillé
-            if (error.status === 403) {
-              console.error('Accès refusé - Vérifiez vos permissions');
-              alert('Accès refusé. Vous n\'avez pas les permissions nécessaires.');
-            } else if (error.status === 401) {
-              console.error('Non authentifié - Reconnectez-vous');
-              alert('Session expirée. Veuillez vous reconnecter.');
-              // Rediriger vers login si nécessaire
-            } else {
-              console.error('Erreur serveur:', error.status, error.message);
-              alert('Erreur lors du chargement des produits. Veuillez réessayer.');
-            }
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement de l\'utilisateur:', error);
-        this.loading = false;
-      }
-    });
-  }
-
-  ajouterAuPanier(produit: Produit) {
-    if (!this.panierService.estDansPanier(produit.id)) {
-      this.panierService.ajouterProduit(produit, 1);
-      
-      // Animation de confirmation (optionnel)
-      const button = event?.target as HTMLElement;
-      if (button) {
-        button.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-          button.style.transform = 'scale(1)';
-        }, 150);
-      }
+onSearch(): void {
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/catalogue'], { 
+        queryParams: { search: this.searchQuery } 
+      });
+      this.searchQuery = '';
     }
   }
-
-  voirDetails(produit: Produit) {
-    this.produitSelectionne = produit;
+  loadProducts(): void {
+    const startIndex = 0;
+    const endIndex = this.productsPerPage * this.currentPage;
+    this.displayedProducts = this.allProducts.slice(startIndex, endIndex);
+    this.hasMoreProducts = endIndex < this.totalProducts;
+  }
+  mobileMenuOpen: boolean = false;
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
   }
 
-  fermerDetails() {
-    this.produitSelectionne = null;
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
+
+  loadMoreProducts(): void {
+    this.currentPage++;
+    this.loadProducts();
+  }
+
+  filterByCategory(): void {
+    if (this.selectedCategory) {
+      this.allProducts = this.products.filter(p => p.category === this.selectedCategory);
+    } else {
+      this.allProducts = [...this.products];
+    }
+    this.totalProducts = this.allProducts.length;
+    this.currentPage = 1;
+    this.loadProducts();
+  }
+
+  toggleFilters(): void {
+    // Ouvrir un modal ou un panneau de filtres
+    console.log('Toggle filters');
+  }
+
+  addToCart(product: Produit): void {
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingItem = cart.find((item: any) => item.id === product.id);
+    
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(`${product.nom} ajouté au panier !`);
+  }
+
+  viewProducer(producerId: number): void {
+    this.router.navigate(['/producteur', producerId]);
   }
 }

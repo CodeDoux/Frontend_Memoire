@@ -1,0 +1,37 @@
+<div class="container categories-container">
+  <h1 class="title">Liste des Code List</h1>
+
+  <div class="mb-3 text-end">
+    <button class="btn btn-add" routerLink="/admin/addCodelist">
+      <i class="fas fa-plus me-1"></i> Ajouter
+    </button>
+  </div>
+
+  <table class="table table-codelist">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>valeur</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let codelist of codelists">
+        <td>{{codelist.id}}</td>
+        <td>{{codelist.type}}</td>
+        <td>{{codelist.value}}</td>
+        <td>{{codelist.description}}</td>
+        <td class="actions-cell">
+          <button class="btn btn-edit" routerLink="/admin/updateCodelist/{{codelist.id}}">
+            <i class="fas fa-edit me-1"></i> Modifier
+          </button>
+          <button class="btn btn-delete" (click)="deleteCodelist(codelist.id)">
+            <i class="fas fa-trash me-1"></i> Supprimer
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

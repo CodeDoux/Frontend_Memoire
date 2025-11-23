@@ -1,88 +1,157 @@
-<div class="catalogue-container">
-    <!-- Afficher seulement si au moins une promo est active -->
-  <div class="promo-message" *ngIf="promotionsActives.length > 0">
-    🎉 {{ promotionsActives[0].nom }} : {{ promotionsActives[0].description }}
-    <span class="promo-dates">
-      (Valable du {{ promotionsActives[0].dateDebut | date:'dd/MM/yyyy' }}
-      au {{ promotionsActives[0].dateFin | date:'dd/MM/yyyy' }})
-    </span>
-  </div>
-      <div class="catalogue-header">
-        <h1>Notre Catalogue</h1>
-        <p>Découvrez nos délicieux produits artisanaux</p>
-      </div>
-    
-
-      <div class="produits-grid" *ngIf="produits.length > 0">
-        <div class="produit-card" *ngFor="let produit of produits">
-          <div class="produit-image">
-            <img [src]="'http://127.0.0.1:8000/storage/' + produit.images" 
-                 [alt]="produit.nom" 
-                 onerror="this.src='assets/images/placeholder.jpg'">
-                 
-                 
-            <div class="produit-overlay" *ngIf="panierService.estDansPanier(produit.id)">
-              <span class="dans-panier">Dans le panier</span>
-            </div>
-          </div>
-          
-          <div class="produit-content">
-            <h3 class="produit-nom">{{ produit.nom }}</h3>
-            <p class="produit-description">{{ produit.description }}</p>
-            <div class="produit-prix">{{ produit.prix }} fcfa</div>
-            
-            <div class="produit-actions">
-              <button class="btn-details" (click)="voirDetails(produit)">
-                <i class="fas fa-eye"></i> Voir détails
-              </button>
-              <button class="btn-panier" 
-                      (click)="ajouterAuPanier(produit)"
-                      [disabled]="panierService.estDansPanier(produit.id)">
-                <i class="fas fa-shopping-cart"></i> 
-                {{ panierService.estDansPanier(produit.id) ? 'Ajouté' : 'Ajouter' }}
-              </button>
-            </div>
-          </div>
-        </div>
+<header class="main-header">
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <!-- Logo -->
+      <div class="logo" routerLink="/">
+        <span class="logo-icon">🌾</span>
+        <span class="logo-text">Circuit Court Alimentaire</span>
       </div>
 
-      <div class="loading" *ngIf="loading">
-        <i class="fas fa-spinner fa-spin"></i> Chargement des produits...
-      </div>
+      <!-- Desktop Navigation -->
+      <ul class="nav-menu desktop-menu">
+        <li class="nav-item">
+          <a routerLink="/" routerLinkActive="active">
+            Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/catalogue" routerLinkActive="active">
+            Produits
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/promotions" routerLinkActive="active">
+            Promotions
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/mon-compte" routerLinkActive="active">
+            Mon Compte
+          </a>
+        </li>
+      </ul>
 
-      <div class="no-products" *ngIf="!loading && produits.length === 0">
-        <i class="fas fa-bread-slice"></i>
-        <h3>Aucun produit disponible</h3>
-        <p>Revenez plus tard pour découvrir nos délicieux produits !</p>
-      </div>
-    </div>
-
-    <!-- Modal détails produit -->
-    <div class="modal-overlay" *ngIf="produitSelectionne" (click)="fermerDetails()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>{{ produitSelectionne.nom }}</h2>
-          <button class="close-modal" (click)="fermerDetails()">×</button>
-        </div>
-        <div class="modal-body">
-          <img [src]="'http://127.0.0.1:8000/storage/' + produitSelectionne.images" 
-               [alt]="produitSelectionne.nom"
-               class="modal-image">
-          <div class="modal-details">
-            <p class="description">{{ produitSelectionne.description }}</p>
-            <div class="prix-modal">{{ produitSelectionne.prix }} fcfa</div>
-            <div class="stock" *ngIf="produitSelectionne.stock">
-              Stock disponible: {{ produitSelectionne.stock }}
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-modal-panier" 
-                  (click)="ajouterAuPanier(produitSelectionne)"
-                  [disabled]="panierService.estDansPanier(produitSelectionne.id)">
-            <i class="fas fa-shopping-cart"></i> 
-            {{ panierService.estDansPanier(produitSelectionne.id) ? 'Déjà dans le panier' : 'Ajouter au panier' }}
+      <!-- Right Section -->
+      <div class="nav-actions">
+        <!-- Search -->
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search in site..." 
+            (keyup.enter)="onSearch()">
+          <button class="search-icon" (click)="onSearch()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
           </button>
         </div>
+
+        <!-- Cart Icon -->
+        <div class="cart-button" routerLink="/panier">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 2L7 6M17 2l2 4M3 6h18M5 6l2 14h10l2-14M10 11v4M14 11v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="mobileMenuOpen">
+    <ul class="mobile-nav-list">
+      <li><a routerLink="/" (click)="closeMobileMenu()">Accueil</a></li>
+      <li><a routerLink="/catalogue" (click)="closeMobileMenu()">Produits</a></li>
+      <li><a routerLink="/promotions" (click)="closeMobileMenu()">Promotions</a></li>
+      <li><a routerLink="/abonnements" (click)="closeMobileMenu()">Abonnements</a></li>
+      <li><a routerLink="/mon-compte" (click)="closeMobileMenu()">Mon Compte</a></li>
+    </ul>
+  </div>
+
+  
+</header>
+<div class="products-page">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" routerLink="accueil">
+      ← Retour
+    </button>
+    <div class="filter-actions">
+      <button class="btn-filter" (click)="toggleFilters()">
+        Filtrer par
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M1 3h14M3 8h10M6 13h4"/>
+        </svg>
+      </button>
+      <select class="select-category" (change)="filterByCategory()">
+        <option value="">Catégorie</option>
+        <option value="legumes">Légumes</option>
+        <option value="fruits">Fruits</option>
+        <option value="cereales">Céréales</option>
+        <option value="epices">Épices</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Title Section -->
+  <div class="title-section">
+    <h1>Nouveautés</h1>
+    <p class="subtitle">Découvrez nos derniers produits frais</p>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="products-container">
+    <div class="products-grid">
+      <!-- Product Card -->
+      <div class="product-card" *ngFor="let product of displayedProducts">
+        <div class="product-image">
+          <img [src]="product.image" [alt]="product.name">
+          <span class="product-badge" *ngIf="product.isNew">Nouveau</span>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-weight">{{ product.weight }}</p>
+          <div class="product-footer">
+            <span class="product-price">{{ product.price }} Fr</span>
+            <!--button class="btn-add-cart" (click)="addToCart(product)">-->
+            <button class="btn-add-cart">
+              Ajouter au panier
+            </button>
+          </div>
+        </div>
+
+        <!-- Producer Info -->
+        <div class="producer-tag">
+          <div class="producer-avatar">
+            <img [src]="product.producerAvatar" [alt]="product.producerName">
+          </div>
+          <div class="producer-info">
+            <span class="producer-name">{{ product.producerName }}</span>
+            <button class="btn-see-products" (click)="viewProducer(product.producerId)">
+              Voir les PRODUITS
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="load-more-section" *ngIf="hasMoreProducts">
+      <button class="btn-load-more" (click)="loadMoreProducts()">
+        <span>Voir plus de produits</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 3v14M3 10l7 7 7-7"/>
+        </svg>
+      </button>
+      <p class="products-count">{{ displayedProducts.length }} / {{ totalProducts }} produits affichés</p>
+    </div>
+  </div>
+</div>

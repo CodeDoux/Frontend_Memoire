@@ -1,0 +1,262 @@
+<header class="main-header">
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <!-- Logo -->
+      <div class="logo" routerLink="/">
+        <span class="logo-icon">🌾</span>
+        <span class="logo-text">Circuit Court Alimentaire</span>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <ul class="nav-menu desktop-menu">
+        <li class="nav-item">
+          <a routerLink="/" routerLinkActive="active">
+            Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/catalogue" routerLinkActive="active">
+            Produits
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/promotions" routerLinkActive="active">
+            Promotions
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/mon-compte" routerLinkActive="active">
+            Mon Compte
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right Section -->
+      <div class="nav-actions">
+        <!-- Search -->
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search in site..." 
+            (keyup.enter)="onSearch()">
+          <button class="search-icon" (click)="onSearch()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Cart Icon -->
+        <div class="cart-button" routerLink="/panier">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 2L7 6M17 2l2 4M3 6h18M5 6l2 14h10l2-14M10 11v4M14 11v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="mobileMenuOpen">
+    <ul class="mobile-nav-list">
+      <li><a routerLink="/" (click)="closeMobileMenu()">Accueil</a></li>
+      <li><a routerLink="/catalogue" (click)="closeMobileMenu()">Produits</a></li>
+      <li><a routerLink="/promotions" (click)="closeMobileMenu()">Promotions</a></li>
+      <li><a routerLink="/abonnements" (click)="closeMobileMenu()">Abonnements</a></li>
+      <li><a routerLink="/mon-compte" (click)="closeMobileMenu()">Mon Compte</a></li>
+    </ul>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Bienvenue sur notre<br>
+          <span class="highlight">plateforme!</span>
+        </h1>
+        <p class="hero-subtitle">
+          Découvrez des produits locaux directement des producteurs.
+        </p>
+        <div class="hero-buttons">
+          <button class="btn btn-outline" routerLink="/catalogue">
+            Explorer les Produits
+          </button>
+          <button class="btn btn-primary" routerLink="/login">
+            Commencer
+          </button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="image-placeholder">
+          <img src="../../../assets/images/ferme.jpg" alt="Producteurs locaux">
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Products Section -->
+<div class="products-section">
+  <h2 class="section-title">Les Derniers Produits</h2>
+  
+  <div class="products-grid">
+    <div class="product-card" *ngFor="let product of produits">
+      <div class="product-image">
+        <img [src]="getImageUrl(product.images[0].chemin)" [alt]="product.nom">
+      </div>
+      <div class="product-info">
+        <h3 class="product-name">{{ product.nom }}</h3>
+        <p class="product-weight">{{ product.description }}</p>
+        <div class="product-footer">
+          <span class="product-price">{{ product.prix }} Fr</span>
+          <button class="btn-add-cart" (click)="addToCart(product)">
+            Ajouter au panier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Producers Section -->
+<div class="producers-section">
+  <h2 class="section-title">Nos Producteurs</h2>
+  <p class="section-subtitle">Découvrez les producteurs locaux de votre région</p>
+  
+  <div class="producers-grid">
+    <div class="producer-card" *ngFor="let producer of producers">
+      <div class="producer-image">
+        <img [src]="producer.image" [alt]="producer.name">
+      </div>
+      <div class="producer-info">
+        <h3 class="producer-name">{{ producer.name }}</h3>
+        <p class="producer-location">📍 {{ producer.location }}</p>
+        <p class="producer-specialty">{{ producer.specialty }}</p>
+        <button class="btn-view-producer" (click)="viewProducer(producer.id)">
+          Voir les produits
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section-action">
+    <button class="btn-view-all" routerLink="/producteurs">
+      Voir tous les producteurs
+    </button>
+  </div>
+</div>
+
+<!-- About Section -->
+<div class="about-section">
+  <div class="about-content">
+    <div class="about-text">
+      <h2 class="section-title">À Propos de Circuit Court</h2>
+      <p class="about-description">
+        Circuit Court est une plateforme qui connecte directement les producteurs locaux 
+        avec les consommateurs. Notre mission est de promouvoir une agriculture durable 
+        et de soutenir les agriculteurs de votre région.
+      </p>
+      <div class="about-features">
+        <div class="feature-item">
+          <span class="feature-icon">🌾</span>
+          <div>
+            <h4>100% Local</h4>
+            <p>Tous nos producteurs sont issus de votre région</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🤝</span>
+          <div>
+            <h4>Direct Producteur</h4>
+            <p>Pas d'intermédiaire, meilleurs prix pour tous</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🌿</span>
+          <div>
+            <h4>Produits Frais</h4>
+            <p>Fraîcheur garantie, livrés le jour même</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🚚</span>
+          <div>
+            <h4>Livraison Rapide</h4>
+            <p>Livraison à domicile le jour de votre choix</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="about-image">
+      <img src="../../../assets/images/ferme.jpg" alt="Producteur local">
+    </div>
+  </div>
+</div>
+
+
+<!-- Testimonials Section -->
+<div class="testimonials-section">
+  <h2 class="section-title">Avis des Clients</h2>
+  <p class="section-subtitle">Découvrez ce que nos clients pensent de Circuit Court</p>
+  
+  <div class="testimonials-grid">
+    <div class="testimonial-card" *ngFor="let testimonial of testimonials">
+      <div class="testimonial-header">
+        <div class="testimonial-avatar">
+          <span>{{ testimonial.initials }}</span>
+        </div>
+        <div class="testimonial-info">
+          <h4 class="testimonial-name">{{ testimonial.name }}</h4>
+          <div class="testimonial-rating">
+            <span *ngFor="let star of [1,2,3,4,5]" 
+                  [class.filled]="star <= testimonial.rating">⭐</span>
+          </div>
+        </div>
+      </div>
+      <p class="testimonial-text">{{ testimonial.text }}</p>
+      <div class="testimonial-footer">
+        <span class="testimonial-date">{{ testimonial.date }}</span>
+        <span class="testimonial-verified" *ngIf="testimonial.verified">✓ Achat vérifié</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="testimonials-stats">
+    <div class="stat-item">
+      <span class="stat-number">4.8/5</span>
+      <span class="stat-label">Note moyenne</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">1,250+</span>
+      <span class="stat-label">Avis clients</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">98%</span>
+      <span class="stat-label">Clients satisfaits</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">500+</span>
+      <span class="stat-label">Producteurs actifs</span>
+    </div>
+  </div>
+
+  <div class="section-action">
+    <button class="btn-leave-review">
+      ✍️ Laisser un avis
+    </button>
+  </div>
+</div>
+
+<!-- Footer -->
+  <div class="footer">
+    <p>© 2025 Circuit Court | Plateforme de vente directe producteurs | Soutenez les agriculteurs locaux</p>
+  </div>

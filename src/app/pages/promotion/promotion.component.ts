@@ -6,6 +6,8 @@ import { ProduitService } from '../../services/produit.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CodelistService } from '../../services/codelist.service';
+import { Codelist } from '../../models/codelist';
 
 @Component({
   selector: 'app-promotion',
@@ -20,6 +22,7 @@ import { RouterModule } from '@angular/router';
 })
 export class PromotionComponent {
 promotions: Promotion[] = [];
+codelists: Codelist[] = [];
   produits: any[] = [];
   loading = true;
   error = '';
@@ -47,7 +50,8 @@ promotions: Promotion[] = [];
   constructor(
     private promotionService: PromotionService,
     private produitService: ProduitService,
-    private authService: AuthService
+    private authService: AuthService,
+    private codelistService: CodelistService
   ) {}
 
   ngOnInit() {
@@ -79,6 +83,7 @@ promotions: Promotion[] = [];
       next: (data) => {
         this.promotions = data;
         this.loading = false;
+        console.log(this.promotions);
       },
       error: (err) => {
         console.error('Erreur lors du chargement des promotions:', err);
@@ -89,7 +94,7 @@ promotions: Promotion[] = [];
   }
 
   loadProduits() {
-    this.produitService.getAll().subscribe({
+    this.produitService.getAllByProducteur().subscribe({
       next: (data) => {
         this.produits = data;
       },
@@ -104,14 +109,19 @@ promotions: Promotion[] = [];
   // Gestion du formulaire
   initializeForm(): Partial<Promotion> {
     return {
+      code: '',
       nom: '',
       description: '',
       reduction: 0,
       dateDebut: '',
       dateFin: '',
-      actif: true
+      seuilMinimum: 10000,
+      utilisationMax: 20,
+      estActif: true,
+      typePromo: "PRODUIT"
     };
   }
+  
 
   openForm(promotion?: Promotion) {
     this.showForm = true;
@@ -136,7 +146,22 @@ promotions: Promotion[] = [];
       this.promotionForm.dateDebut = today.toISOString().split('T')[0];
       this.promotionForm.dateFin = nextMonth.toISOString().split('T')[0];
     }
+    //this.loadCodelist();
   }
+  /*loadCodelist(): void {
+    //this.isLoadingCategories = true;
+    this.codelistService.getValueByType('TypePromo').subscribe({
+      next: (data) => {
+        this.codelists = data;
+       // this.isLoadingCategories = false;
+      },
+      error: (err) => {
+        this.error = 'Erreur lors du chargement des Codelist.';
+        //this.isLoadingCategories = false;
+        console.error(err);
+      }
+    });
+  }*/
 
   closeForm() {
     this.showForm = false;
@@ -160,9 +185,26 @@ promotions: Promotion[] = [];
       promotionData.dateFin = new Date(promotionData.dateFin).toISOString();
     }
 
+const payload = {
+    nom: promotionData.nom,
+    description: promotionData.description,
+    reduction: promotionData.reduction,
+    dateDebut: promotionData.dateDebut,
+    dateFin: promotionData.dateFin,
+    estActif: promotionData.estActif,
+    seuilMinimum: promotionData.seuilMinimum,
+    utilisationMax: promotionData.utilisationMax,
+    code: promotionData.code || '',
+    typePromo: promotionData.typePromo,
+    // ✅ Transformer les objets en IDs :
+    produits: (promotionData.produits || []).map((p: any) => p.id),
+  };
+  console.log(promotionData);
+  console.log(payload);
     const request = this.editingPromotion
-      ? this.promotionService.update(this.editingPromotion.id, promotionData)
-      : this.promotionService.create(promotionData);
+    
+      ? this.promotionService.update(this.editingPromotion.id, payload)
+      : this.promotionService.create(payload);
 
     request.subscribe({
       next: (response) => {
@@ -197,11 +239,12 @@ promotions: Promotion[] = [];
   }
 
   togglePromotion(promotion: Promotion) {
-    this.promotionService.toggle(promotion.id, !promotion.actif).subscribe({
+    console.log(promotion);
+    this.promotionService.toggle(promotion.id, !promotion.estActif).subscribe({
       next: (response) => {
-        promotion.actif = !promotion.actif;
+        promotion.estActif = !promotion.estActif;
         this.showSuccessMessage(
-          promotion.actif ? 'Promotion activée' : 'Promotion désactivée'
+          promotion.estActif ? 'Promotion activée' : 'Promotion désactivée'
         );
       },
       error: (err) => {
@@ -336,7 +379,7 @@ associerProduits() {
   }
 
   isActive(promotion: Promotion): boolean {
-    if (!promotion.actif) return false;
+    if (!promotion.estActif) return false;
     
     const now = new Date();
     const debut = new Date(promotion.dateDebut);
@@ -354,7 +397,7 @@ associerProduits() {
   }
 
   getStatutClass(promotion: Promotion): string {
-    if (!promotion.actif) return 'statut-inactive';
+    if (!promotion.estActif) return 'statut-inactive';
     if (this.isActive(promotion)) return 'statut-active';
     if (this.isExpired(promotion)) return 'statut-expired';
     if (this.isFuture(promotion)) return 'statut-future';
@@ -362,7 +405,7 @@ associerProduits() {
   }
 
   getStatutText(promotion: Promotion): string {
-    if (!promotion.actif) return 'Inactive';
+    if (!promotion.estActif) return 'Inactive';
     if (this.isActive(promotion)) return 'Active';
     if (this.isExpired(promotion)) return 'Expirée';
     if (this.isFuture(promotion)) return 'Future';
@@ -371,6 +414,9 @@ associerProduits() {
 
   // Filtrage et pagination
   get promotionsFiltrees() {
+    if (!Array.isArray(this.promotions)) {
+    return []; // sécurité si les données ne sont pas encore chargées
+  }
     let filtered = [...this.promotions];
     
     if (this.searchTerm) {
@@ -386,7 +432,7 @@ associerProduits() {
           filtered = filtered.filter(p => this.isActive(p));
           break;
         case 'inactive':
-          filtered = filtered.filter(p => !p.actif);
+          filtered = filtered.filter(p => !p.estActif);
           break;
         case 'expired':
           filtered = filtered.filter(p => this.isExpired(p));
@@ -428,10 +474,10 @@ associerProduits() {
 
   // Permissions
   canEdit(): boolean {
-    return this.userRole === 'ADMIN' || this.userRole === 'EMPLOYE';
+    return this.userRole === 'PRO';
   }
 
   canDelete(): boolean {
-    return this.userRole === 'ADMIN';
+    return this.userRole === 'PRO';
   }
 }

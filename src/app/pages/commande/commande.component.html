@@ -66,11 +66,11 @@
             <td>
               <span class="statut-badge"
                 [ngClass]="{
-                  'statut-preparation': commande.statut === 'en_préparation',
-                  'statut-livraison': commande.statut === 'en_livraison',
-                  'statut-livree': commande.statut === 'livrée',
-                  'statut-annulee': commande.statut === 'annulée',
-                  'statut-prete': commande.statut === 'prete'
+                  'statut-preparation': commande.statut === 'EN_PREPARATION',
+                  'statut-livraison': commande.statut === 'EN_LIVRAISON',
+                  'statut-livree': commande.statut === 'LIVREE',
+                  'statut-annulee': commande.statut === 'ANNULEE',
+                  'statut-prete': commande.statut === 'PRETE'
                 }">
                 {{ commande.statut | titlecase }}
               </span>
@@ -86,7 +86,7 @@
 </select>
              <button 
                 class="action-btn btn-non-paye"
-                *ngIf="commande.paiement && commande.paiement.statut !== 'payée'"
+                *ngIf="commande.paiement && commande.paiement.statut !== 'PAYEE'"
                 (click)="Payer(commande)">
                 <i class="fas fa-times-circle"></i> Non Payée
             </button>

@@ -8,12 +8,14 @@ import { PaiementService } from '../../services/paiement.service';
 import { LivraisonService } from '../../services/livraison.service';
 import { NgChartsModule } from 'ng2-charts';
 import { ChartType } from 'chart.js';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [
+    FormsModule,
     CommonModule,
     RouterLink,
     RouterOutlet,
@@ -40,6 +42,14 @@ export class AdminDashboardComponent implements OnInit {
     private paiementService: PaiementService,
     private livraisonService: LivraisonService
   ) {}
+  searchQuery: string = '';
+    onSearch(): void {
+    if (this.searchQuery.trim()) {
+      console.log('Recherche:', this.searchQuery);
+      // Implémenter la logique de recherche
+      // this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
+    }
+  }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
@@ -47,8 +57,11 @@ export class AdminDashboardComponent implements OnInit {
   // on verifie le role de l'utilisateur
       if (user && user.role !== 'ADMIN') {
         this.router.navigate(['/unauthorized']);
+      } else {
+        this.statistiques();
       }
     });
+
 
     // Charger l'utilisateur si pas encore fait
     if (!this.currentUser && this.authService.isAuthenticated()) {
@@ -61,8 +74,8 @@ export class AdminDashboardComponent implements OnInit {
     return this.authService.hasRole('ADMIN');
   }
 
-  isEmploye(): boolean {
-    return this.authService.hasRole('EMPLOYE');
+  isproducteur(): boolean {
+    return this.authService.hasRole('PRO');
   }
 
   isClient(): boolean {
@@ -85,19 +98,19 @@ export class AdminDashboardComponent implements OnInit {
     this.commandeService.getAll().subscribe(data => {
       this.totalCommandes = data.length;
       this.commandesStatut = {
-        preparation: data.filter(c => c.statut === 'en_préparation').length,
-        prete: data.filter(c => c.statut === 'prete').length,
-        livraison: data.filter(c => c.statut === 'en_livraison').length,
-        livree: data.filter(c => c.statut === 'livrée').length,
-        annulee: data.filter(c => c.statut === 'annulée').length,
+        preparation: data.filter(c => c.statut === 'EN_PREPARATION').length,
+        prete: data.filter(c => c.statut === 'PRETE').length,
+        livraison: data.filter(c => c.statut === 'EN_LIVRAISON').length,
+        livree: data.filter(c => c.statut === 'LIVREE').length,
+        annulee: data.filter(c => c.statut === 'ANNULEE').length,
       };
     });
 
     this.paiementService.getAll().subscribe(data => {
       this.totalPaiements = data.length;
       this.paiementsStatut = {
-        payee: data.filter(p => p.statut === 'payée').length,
-        nonPayee: data.filter(p => p.statut !== 'payée').length
+        payee: data.filter(p => p.statut === 'PAYEE').length,
+        nonPayee: data.filter(p => p.statut !== 'PAYEE').length
       };
     });
 

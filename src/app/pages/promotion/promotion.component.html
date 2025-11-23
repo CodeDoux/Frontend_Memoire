@@ -185,11 +185,11 @@
 
                             <button class="action-btn btn-toggle" 
                                     *ngIf="canEdit()"
-                                    [class.inactive]="!promotion.actif"
+                                    [class.inactive]="!promotion.estActif"
                                     (click)="togglePromotion(promotion)"
                                     title="Activer/Désactiver">
-                                <i class="fas" [class.fa-toggle-on]="promotion.actif" [class.fa-toggle-off]="!promotion.actif"></i>
-                                {{ promotion.actif ? 'Désactiver' : 'Activer' }}
+                                <i class="fas" [class.fa-toggle-on]="promotion.estActif" [class.fa-toggle-off]="!promotion.estActif"></i>
+                                {{ promotion.estActif ? 'Désactiver' : 'Activer' }}
                             </button>
                             
                             <button class="action-btn btn-edit" 
@@ -264,6 +264,30 @@
                     <input type="number" id="reduction" [(ngModel)]="promotionForm.reduction" name="reduction" 
                            min="1" max="100" required>
                 </div>
+                <div class="form-group">
+  <label for="typePromo">Type de promotion</label>
+
+  <select
+    id="typePromo"
+    class="form-select"
+    [(ngModel)]="promotionForm.typePromo"
+    name="typePromo"
+    required
+  >
+    <option value="PRODUIT">PRODUIT</option>
+    <option value="COMMANDE">COMMANDE</option>
+  </select>
+</div>
+                 <div class="form-group">
+                    <label for="seuilMinimum">Seuil Minimum (optionnel)</label>
+                    <input type="number" id="seuilMinimum" [(ngModel)]="promotionForm.seuilMinimum" name="seuilMinimum" 
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="utilisationMax">utilisationMax (optionnel)</label>
+                    <input type="number" id="utilisationMax" [(ngModel)]="promotionForm.utilisationMax" name="utilisationMax" 
+                           required>
+                </div>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -279,7 +303,7 @@
 
                 <div class="form-group">
                     <div class="checkbox-group">
-                        <input type="checkbox" id="actif" [(ngModel)]="promotionForm.actif" name="actif">
+                        <input type="checkbox" id="actif" [(ngModel)]="promotionForm.estActif" name="actif">
                         <label for="actif">Promotion active</label>
                     </div>
                 </div>

@@ -13,7 +13,8 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:application",
                     "options": {
-                        "outputPath": "dist/gestion_boulangerie",
+                        "baseHref": "/",
+                        "outputPath": "dist/frontend_memoire",
                         "index": "src/index.html",
                         "browser": "src/main.ts",
                         "polyfills": [

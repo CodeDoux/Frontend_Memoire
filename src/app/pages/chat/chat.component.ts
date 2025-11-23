@@ -15,7 +15,7 @@ import { RouterModule } from '@angular/router';
       RouterModule,
       FormsModule,],
   templateUrl: './chat.component.html',
-  styleUrl: './chat.component.css'
+  styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit{
   messages: any[] = [];
@@ -36,9 +36,9 @@ export class ChatComponent implements OnInit{
       this.emeteur = 1;
     }
 
-    this.getAllMessages();
+    //this.getAllMessages();
   }
-  getAllMessages() {
+ /* getAllMessages() {
   this.chatService.getAll().subscribe(
     (data: Chat[]) => {
       this.messages = data;
@@ -49,7 +49,7 @@ export class ChatComponent implements OnInit{
     }
   );
 }
-  sendMessage() {
+  /*sendMessage() {
   const contenu = this.newMessage?.trim();
   if (!contenu) return;
 
@@ -72,5 +72,5 @@ export class ChatComponent implements OnInit{
       console.error('Erreur lors de l’envoi du message :', err);
     }
   });
-}
+}*/
 }

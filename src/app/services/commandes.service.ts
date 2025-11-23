@@ -11,6 +11,10 @@ export class CommandesService {
 
   constructor(private http: HttpClient) {}
 
+  getOrderStats() {
+  return this.http.get<any>(`${this.URL}/commandes/stats`);
+}
+
   // Récupérer toutes les commandes (Admin / Employé)
   getAll(): Observable<Commande[]> {
     return this.http.get<Commande[]>(`${this.URL}/commandes`).pipe(

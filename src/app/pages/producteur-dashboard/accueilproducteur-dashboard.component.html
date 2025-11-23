@@ -1,0 +1,112 @@
+
+<!-- Main Content -->
+ <div class="container mt-4">
+<div class="main-content">
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <div class="header-content">
+      <div class="profile-section">
+        <div class="profile-avatar"></div>
+        <div class="profile-info">
+          <h2>{{ producteur.nom }}</h2>
+          <div>
+            <span class="profile-badge" *ngFor="let badge of producteur.badges">
+              {{ badge }}
+            </span>
+          </div>
+          <p class="profile-description">
+            {{ producteur.description }}
+          </p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline" (click)="voirProfil()">Voir Profil</button>
+        <button class="btn-primary" (click)="ajouterProduit()">Ajouter un Produit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-section">
+    <div class="stats-header">
+      <div>
+        <h3>Statistiques de Ventes</h3>
+        <p class="stats-subtitle">Suivez vos ventes et performances</p>
+      </div>
+      <div class="stats-actions">
+        <button class="btn-white" (click)="telechargerRapport()">Télécharger Rapport</button>
+        <button class="btn-green" (click)="voirDetails()">Voir Détails</button>
+      </div>
+    </div>
+    <div class="stats-content">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-label">Ventes Totales</div>
+          <div class="stat-value">{{ stats.ventesTotales }}</div>
+          <div class="stat-change positive">{{ stats.ventesChange }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Nouveaux Clients</div>
+          <div class="stat-value">{{ stats.nouveauxClients }}</div>
+          <div class="stat-change positive">{{ stats.clientsChange }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Produits en Stock</div>
+          <div class="stat-value">{{ stats.produitsStock }}</div>
+          <div class="stat-change negative">{{ stats.stockChange }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Promotions Actives</div>
+          <div class="stat-value">{{ stats.promotionsActives }}</div>
+          <div class="stat-change positive">{{ stats.promosChange }}</div>
+        </div>
+      </div>
+      <div class="chart-area">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Tendance des Ventes</div>
+            <div class="chart-subtitle">Chiffre d'Affaires</div>
+          </div>
+          <a href="#" class="chart-link">Mois</a>
+        </div>
+        <div class="chart-container">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Section -->
+  <div class="products-section">
+    <div class="section-header">
+      <h3>Vos Produits</h3>
+      <button class="btn-white" (click)="voirTousProduits()">Voir tous</button>
+    </div>
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let produit of produits">
+        <div class="product-image">{{ produit.emoji }}</div>
+        <div class="product-info">
+          <div class="product-name">{{ produit.nom }}</div>
+          <div class="product-details">{{ produit.categorie }}</div>
+          <div class="product-price">{{ produit.prix }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promotions Section -->
+  <div class="promotions-section">
+    <div class="section-header">
+      <h3>Promotions Actuelles</h3>
+      <button class="btn-green" (click)="creerPromotion()">Créer une promotion</button>
+    </div>
+    <div class="promotions-grid">
+      <div class="promo-card" *ngFor="let promo of promotions">
+        <h4>{{ promo.titre }}</h4>
+        <p [innerHTML]="promo.description"></p>
+      </div>
+    </div>
+  </div>
+  <div>
+
+

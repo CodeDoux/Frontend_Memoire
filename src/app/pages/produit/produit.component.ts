@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 import { Produit } from '../../models/produit';
 import { ProduitService } from '../../services/produit.service';
 import { AuthService } from '../../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-produit',
@@ -12,58 +13,131 @@ import { AuthService } from '../../services/auth.service';
     CommonModule,
     RouterLink,
     RouterModule,
+    FormsModule
     
   ],
   templateUrl: './produit.component.html',
   styleUrl: './produit.component.css'
 })
 export class ProduitComponent {
- produits: Produit[] = [];
-  isLoading = true;
-  error: string | null = null;
-  currentUser: any;
+   currentFilter: string = 'all';
+  sortBy: string = 'recent';
+produits: Produit[] = [];
+isLoading: boolean=false;
+error: string | null = null;  
+  filteredProducts: Produit[] = [];
+  validatedProducts: number = 0;
+  pendingProducts: number = 0;
+  totalProducts: number = 0;
+
 
   constructor(
     private produitService: ProduitService,
     private authService: AuthService,
-    public router: Router // CORRECTION: Rendre router public pour le template
+    public router: Router
   ) {}
+  getBaseRoute(): string {
+  if (this.authService.hasRole('ADMIN')) {
+    return '/admin';
+  } else if (this.authService.hasRole('PRO')) {
+    return '/producteur';
+  }
+  return '';
+}
 
   ngOnInit(): void {
-    // S'assurer que l'utilisateur est chargé avant d'accéder aux produits
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-      if (user) {
-        console.log('Utilisateur connecté:', user);
-        console.log('Rôle utilisateur:', user.role);
-        this.getAll();
-      } else if (this.authService.isAuthenticated()) {
-        // L'utilisateur est authentifié mais pas encore chargé, attendre
-        this.authService.waitForUserLoaded().subscribe({
-          next: (loadedUser) => {
-            this.currentUser = loadedUser;
-            if (loadedUser) {
-              this.getAll();
-            }
-          },
-          error: (err) => {
-            console.error('Erreur chargement utilisateur:', err);
-            this.router.navigate(['/login']);
-          }
-        });
-      } else {
-        this.router.navigate(['/login']);
-      }
-    });
+    this.calculateStats();
+    this.filterProducts('all');
+    this.getAll();
   }
+
+  calculateStats(): void {
+    this.totalProducts = this.produits.length;
+    this.validatedProducts = this.produits.filter(p => p.validationAdmin==='VALIDE').length;
+    this.pendingProducts = this.produits.filter(p => !(p.validationAdmin==='VALIDE')).length;
+  }
+   filterProducts(filter: string): void {
+    this.currentFilter = filter;
+    
+    switch(filter) {
+      case 'validated':
+        this.filteredProducts = this.produits.filter(p => p.validationAdmin==='VALIDE');
+        break;
+      case 'pending':
+        this.filteredProducts = this.produits.filter(p => !(p.validationAdmin==='VALIDE'));
+        break;
+      default:
+        this.filteredProducts = [...this.produits];
+    }
+    
+    this.sortProducts();
+  }
+
+  sortProducts(): void {
+    switch(this.sortBy) {
+      case 'name':
+        this.filteredProducts.sort((a, b) => a.nom.localeCompare(b.nom));
+        break;
+      case 'price-asc':
+        this.filteredProducts.sort((a, b) => a.prix - b.prix);
+        break;
+      case 'price-desc':
+        this.filteredProducts.sort((a, b) => b.prix - a.prix);
+        break;
+      case 'recent':
+      default:
+        this.filteredProducts.sort((a, b) => b.createdAt?.getTime() - a.createdAt?.getTime());
+    }
+  }
+   addNewProduct(): void {
+    this.router.navigate(['/producteur/addProduit']);
+  }
+  isValid(produit: Produit)
+  {
+    return produit['validationAdmin']==='VALIDE';
+  }
+
+  editProduct(produit: Produit): void {
+    this.router.navigate(['/producteur/produits/modifier', produit.id]);
+  }
+
+  deleteProduct(produit: Produit): void {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer "${produit.nom}" ?`)) {
+      this.produits = this.produits.filter(p => p.id !== produit.id);
+      this.calculateStats();
+      this.filterProducts(this.currentFilter);
+      alert('Produit supprimé avec succès !');
+    }
+  }
+
+  manageProduct(produit: Produit): void {
+    this.router.navigate(['/producteur/produits/gerer', produit.id]);
+  }
+
+  getEmptyMessage(): string {
+    switch(this.currentFilter) {
+      case 'validated':
+        return 'Vous n\'avez pas encore de produits validés.';
+      case 'pending':
+        return 'Aucun produit en attente de validation.';
+      default:
+        return 'Commencez par ajouter votre premier produit.';
+    }
+  }
+
+  getImageUrl(image: string): string {
+  return `http://localhost:8000/storage/${image}`;
+}
+
 
   getAll(): void {
     this.isLoading = true;
     this.error = null;
 
-    this.produitService.getAll().subscribe({
+    this.produitService.getAllByProducteur().subscribe({
       next: (data: Produit[]) => {
         this.produits = data;
+        this.filteredProducts=this.produits;
         this.isLoading = false;
         console.log('Produits récupérés:', data);
       },
@@ -71,51 +145,9 @@ export class ProduitComponent {
         this.isLoading = false;
         console.error('Erreur lors de la récupération des produits:', error);
         
-        if (error.status === 403) {
-          this.error = `Accès refusé. Votre rôle (${this.currentUser?.role}) ne permet pas d'accéder aux produits.`;
-        } else if (error.status === 401) {
-          this.error = 'Session expirée. Veuillez vous reconnecter.';
-          // Pas besoin de naviguer ici, le bouton le fera
-        } else {
-          this.error = 'Erreur lors du chargement des produits.';
-        }
       }
     });
   }
 
-  deleteProduit(id: number): void {
-    if (!this.canManageProducts()) {
-      alert('Vous n\'avez pas les permissions pour supprimer ce produit.');
-      return;
-    }
-
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-      this.produitService.deleteProduit(id).subscribe({
-        next: () => {
-          console.log('Produit supprimé');
-          this.getAll(); // Recharger la liste
-        },
-        error: (error) => {
-          console.error('Erreur lors de la suppression:', error);
-          alert('Erreur lors de la suppression du produit.');
-        }
-      });
-    }
-  }
-
-  // Méthodes pour vérifier les permissions
-  canViewProducts(): boolean {
-    return this.authService.hasAnyRole(['ADMIN', 'EMPLOYE', 'CLIENT']);
-  }
-
-  canManageProducts(): boolean {
-    return this.authService.hasRole('ADMIN');
-  }
-
-  canAddProduct(): boolean {
-    return this.authService.hasRole('ADMIN');
-  }
-  cancel(): void {
-  this.router.navigate(['/admin/produit']);
-}
+ 
 }

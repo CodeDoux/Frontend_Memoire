@@ -1,8 +1,8 @@
 export class Paiement {
    id!: number;
   commande_id!: number;
-  statut!: 'payée' | 'non_payée';
-mode_paiement!: 'en_ligne' | 'a_la_livraison';
+  statut!: 'PAYEE' | 'NON_PAYEE';
+mode_paiement!: 'EN_LIGNE' | 'EN_ESPECE';
   montant_paye!: number;
   date_paiement!: string;
   reference_transaction?: string;

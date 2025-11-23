@@ -76,7 +76,7 @@ export class AddUserComponent implements OnInit {
           ()=>{
             console.log("success");
             this.router.navigateByUrl('/admin/utilisateur');
-          },
+            },
           (error)=>{
             console.log(error);
           }

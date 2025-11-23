@@ -2,12 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Promotion } from '../models/promotion';
+import { Produit } from '../models/produit';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PromotionService {
 private apiUrl = 'http://localhost:8000/api/promotions';
+private url='http://localhost:8000/api/addPromotion';
 
   constructor(private http: HttpClient) {}
 
@@ -21,9 +23,10 @@ private apiUrl = 'http://localhost:8000/api/promotions';
     return this.http.get<Promotion>(`${this.apiUrl}/${id}`);
   }
 
+  
   // Créer une nouvelle promotion
   create(promotion: Partial<Promotion>): Observable<any> {
-    return this.http.post(this.apiUrl, promotion);
+    return this.http.post(this.url, promotion);
   }
 
   // Mettre à jour une promotion
@@ -52,8 +55,8 @@ private apiUrl = 'http://localhost:8000/api/promotions';
   }
 
   // Activer/Désactiver une promotion
-  toggle(id: number, actif: boolean): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}/toggle`, { actif });
+  toggle(id: number, estActif: boolean): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/toggle`, { estActif });
   }
 
   // Dupliquer une promotion

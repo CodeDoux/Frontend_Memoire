@@ -1,19 +1,28 @@
+import { type } from "node:os";
+import { Produit } from "./produit";
+
 export interface Promotion {
   id: number;
   nom: string;
+  code: string;
   description?: string;
   reduction: number;
   dateDebut: string;
   dateFin: string;
-  actif: boolean;
+  seuilMinimum?: number;
+  utilisationMax?: number;
+  usage?: number;
+  estActif: boolean;
+  type_id: number;
+  typePromo: TypePromotion;
   created_at?: string;
   updated_at?: string;
   
   // Relations
   produits?: any[];
 }
-
-export interface PromotionProduit {
+export type TypePromotion = 'PRODUIT' | 'COMMANDE';
+/*export interface PromotionProduit {
   id: number;
   promo_id: number;
   produit_id: number;
@@ -23,5 +32,6 @@ export interface PromotionProduit {
   
   // Relations
   promotion?: Promotion;
-  produit?: any;
-}
+  produit?: Produit;
+}*/
+

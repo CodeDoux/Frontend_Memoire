@@ -1,0 +1,44 @@
+<body>
+  <div class="container users-container">
+    <div class="header">
+      <h1>Gestion des Administrateurs</h1>
+    </div>
+
+    <div class="controls mb-3 d-flex justify-content-between align-items-center">
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Rechercher un administrateur..." id="searchInput">
+      </div>
+      <a class="btn btn-add" routerLink="/admin/addAdmin">
+        <i class="fas fa-plus me-1"></i> Ajouter un admin
+      </a>
+    </div>
+
+    <div class="table-container">
+      <table class="table table-users">
+        <thead>
+          <tr>
+            <th>Nom Complet</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let admin of admins">
+            <td>{{admin.user.nomComplet}}</td>
+            <td>{{admin.user.email}}</td>
+            <td>{{ admin.role_label }}</td>
+            <td class="actions-cell">
+              <button class="btn btn-edit" routerLink="/admin/updateAdmin/{{admin.id}}">
+                <i class="fas fa-edit me-1"></i> Modifier
+              </button>
+              <button class="btn btn-delete" (click)="supprimerAdmin(admin.id!)">
+                <i class="fas fa-trash me-1"></i> Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

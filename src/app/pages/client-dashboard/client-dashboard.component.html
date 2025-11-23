@@ -1,38 +1,80 @@
-<!-- Navbar -->
-<nav class="navbar">
-  <div class="navbar-brand">
-    <h2>Boulangerie Artisanale</h2>
-  </div>
-  
-  <div class="navbar-menu">
-    <a routerLink="catalogue" routerLinkActive="active" class="nav-link">
-      <i class="fas fa-bread-slice"></i> Catalogue
-    </a>
-    <a routerLink="mes-commandes" routerLinkActive="active" class="nav-link">
-      <i class="fas fa-shopping-bag"></i> Mes Commandes
-    </a>
-    <li class="nav-item">
-          <a class="nav-link" routerLink="chats" routerLinkActive="active">
-            <i class="bi bi-box me-2"></i>chats
-          </a>
-        </li>
-
-    <a routerLink="panier" routerLinkActive="active" class="panier-container nav-link">
-      <i class="fas fa-shopping-cart panier-icon"></i>
-      <span class="panier-badge">
-        {{ nombreProduitsPanier }}
-      </span>
-      <span class="panier-text">Panier</span>
-    </a>
+<!-- Barre de promotions -->
+<div class="promo-bar">
+  <div class="promo-content">
+    <div class="promo-slider">
+      <div *ngFor="let promo of promotions; let i = index" 
+           [class.active]="i === currentPromoIndex"
+           class="promo-text">
+        {{promo}}
+      </div>
+    </div>
     
-    <button class="logout-btn" (click)="logout()">
-      <i class="fas fa-sign-out-alt"></i> Déconnexion
-    </button>
+    <div class="promo-actions">
+      <!-- Panier -->
+      <a routerLink="panier" class="promo-cart-btn">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-badge" *ngIf="cartCount > 0">{{cartCount}}</span>
+      </a>
+      
+      <!-- Connexion -->
+      <button class="promo-login-btn" (click)="logout()">
+        <span class="login-icon">👤</span>
+        Se connecter
+      </button>
+    </div>
   </div>
-</nav>
+</div>
 
 
 <!-- Contenu principal -->
 <div class="main-content">
   <router-outlet></router-outlet>
 </div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>🌾 Circuit Court</h3>
+      <p>Connectez directement producteurs locaux et consommateurs engagés.</p>
+      <div class="social-links">
+        <a href="#" class="social-link">Facebook</a>
+        <a href="#" class="social-link">Instagram</a>
+        <a href="#" class="social-link">Twitter</a>
+      </div>
+    </div>
+    
+    <div class="footer-section">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a routerLink="/">Accueil</a></li>
+        <li><a routerLink="/catalogue">Catalogue</a></li>
+        <li><a routerLink="/producteurs">Producteurs</a></li>
+        <li><a routerLink="/about">À propos</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-section">
+      <h4>Informations</h4>
+      <ul>
+        <li><a href="#">Mentions légales</a></li>
+        <li><a href="#">CGV</a></li>
+        <li><a href="#">Politique de confidentialité</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-section">
+      <h4>Newsletter</h4>
+      <p>Inscrivez-vous pour recevoir nos offres</p>
+      <div class="newsletter-form">
+        <input type="email" placeholder="Votre email">
+        <button>S'inscrire</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>© 2025 Circuit Court | Plateforme de vente directe producteurs | Tous droits réservés</p>
+  </div>
+</footer>

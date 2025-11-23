@@ -1,0 +1,507 @@
+<div class="products-management-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" routerLink="/admin/acceuilAdmin">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M15 10H5M10 5l-5 5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Retour
+      </button>
+      <div class="header-info">
+        <h1>Gestion des Produits</h1>
+        <p class="subtitle">Validez et gérez tous les produits de la plateforme</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 14V6M6 10l4-4 4 4M3 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Exporter
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-container">
+    <div class="tabs-nav">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'pending'"
+        (click)="switchTab('pending')">
+        <span class="tab-icon">⏳</span>
+        En attente de validation
+        <span class="tab-badge" *ngIf="stats.pending > 0">{{ stats.pending }}</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'all'"
+        (click)="switchTab('all')">
+        <span class="tab-icon">📦</span>
+        Tous les produits
+        <span class="tab-count">{{ stats.total }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Pending Products Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'pending'">
+    <!-- Stats Cards -->
+    <div class="stats-row">
+      <div class="mini-stat-card">
+        <div class="mini-stat-icon pending">⏳</div>
+        <div class="mini-stat-info">
+          <span class="mini-stat-value">{{ stats.pending }}</span>
+          <span class="mini-stat-label">En attente</span>
+        </div>
+      </div>
+      <div class="mini-stat-card">
+        <div class="mini-stat-icon validated">✓</div>
+        <div class="mini-stat-info">
+          <span class="mini-stat-value">{{ stats.validatedToday }}</span>
+          <span class="mini-stat-label">Validés aujourd'hui</span>
+        </div>
+      </div>
+      <div class="mini-stat-card">
+        <div class="mini-stat-icon rejected">✗</div>
+        <div class="mini-stat-info">
+          <span class="mini-stat-value">{{ stats.rejectedToday }}</span>
+          <span class="mini-stat-label">Refusés aujourd'hui</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Rechercher un produit..."
+          [(ngModel)]="searchQuery"
+          (input)="filterProducts()">
+      </div>
+      <select class="filter-select" [(ngModel)]="filterCategory" (change)="filterProducts()">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="sortBy" (change)="sortProducts()">
+        <option value="recent">Plus récent</option>
+        <option value="oldest">Plus ancien</option>
+        <option value="name">Nom A-Z</option>
+      </select>
+    </div>
+
+    <!-- Table Card with Toggle -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Produits en attente ({{ filteredPendingProducts.length }})</h3>
+        <div class="view-toggle">
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewModePending === 'table'"
+            (click)="viewModePending = 'table'">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewModePending === 'grid'"
+            (click)="viewModePending = 'grid'">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="table-container" *ngIf="viewModePending === 'table' && filteredPendingProducts.length > 0">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Producteur</th>
+              <th>Catégorie</th>
+              <th>Prix</th>
+              <th>Stock</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of filteredPendingProducts">
+              <td>
+                <div class="product-cell">
+                  <img 
+                    [src]="product?.images && product.images.length > 0 ? getImageUrl(product.images[0].chemin) : 'assets/images/placeholder.jpg'" 
+                    [alt]="product.nom" 
+                    class="product-thumb">
+                  <div class="product-cell-info">
+                    <span class="product-cell-name">{{ product.nom }}</span>
+                    <span class="product-cell-weight">{{ product.poids }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="producer-cell">
+                  <div class="producer-avatar">{{ getInitials(product.producteur?.utilisateur?.nomComplet) }}</div>
+                  <span>{{ product.producteur?.utilisateur?.nomComplet || 'N/A' }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="category-tag">{{ product.categorie?.nom || 'N/A' }}</span>
+              </td>
+              <td class="price-cell">{{ product.prix }} Fr</td>
+              <td>
+                <span class="stock-badge" [class.low]="product.stock < product.seuilAlerteStock">
+                  {{ product.stock }}
+                </span>
+              </td>
+              <td class="date-cell">{{ product.dateAjout | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-table-action validate" (click)="validateProduct(product)" title="Valider">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M13 4L6 11l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <button class="btn-table-action" (click)="viewProductDetails(product)" title="Voir">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                      <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                    </svg>
+                  </button>
+                  <button class="btn-table-action delete" (click)="rejectProduct(product)" title="Refuser">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Grid View -->
+      <div class="grid-container" *ngIf="viewModePending === 'grid' && filteredPendingProducts.length > 0">
+        <div class="product-grid-card pending-card" *ngFor="let product of filteredPendingProducts">
+          <div class="grid-card-image">
+            <img 
+              [src]="product?.images && product.images.length > 0 ? getImageUrl(product.images[0].chemin) : 'assets/images/placeholder.jpg'" 
+              [alt]="product.nom">
+            <span class="grid-status-badge en_attente">
+              En attente
+            </span>
+            <span class="time-badge">Il y a {{ getTimeAgo(product.dateAjout!) }}</span>
+          </div>
+          <div class="grid-card-body">
+            <h4>{{ product.nom }}</h4>
+            <p class="grid-description">{{ product.description | slice:0:80 }}...</p>
+            <p class="grid-producer">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                <path d="M7 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM2 13v-2a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+              </svg>
+              {{ product.producteur?.utilisateur?.nomComplet }}
+            </p>
+            <div class="grid-specs">
+              <div class="grid-spec-item">
+                <span class="grid-spec-label">Prix</span>
+                <span class="grid-spec-value">{{ product.prix }} Fr</span>
+              </div>
+              <div class="grid-spec-item">
+                <span class="grid-spec-label">Stock</span>
+                <span class="grid-spec-value">{{ product.stock }}</span>
+              </div>
+            </div>
+            <div class="grid-card-actions">
+              <button class="btn-grid-validate" (click)="validateProduct(product)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M13 4L6 11l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Valider
+              </button>
+              <button class="btn-grid-reject" (click)="rejectProduct(product)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Refuser
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredPendingProducts.length === 0">
+        <div class="empty-icon">✓</div>
+        <h3>Aucun produit en attente</h3>
+        <p>Tous les produits ont été traités</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Products Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'all'">
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Rechercher un produit..."
+          [(ngModel)]="searchQueryAll"
+          (input)="filterAllProducts()">
+      </div>
+      
+      <select class="filter-select" [(ngModel)]="filterProducer" (change)="filterAllProducts()">
+        <option value="">Tous les producteurs</option>
+        <option *ngFor="let producer of producers" [value]="producer.id">
+          {{ producer.utilisateur?.nomComplet }}
+        </option>
+      </select>
+      
+      <select class="filter-select" [(ngModel)]="filterCategoryAll" (change)="filterAllProducts()">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
+      </select>
+      
+      <select class="filter-select" [(ngModel)]="filterStatus" (change)="filterAllProducts()">
+        <option value="">Tous les statuts</option>
+        <option value="VALIDE">Validés</option>
+        <option value="EN_ATTENTE">En attente</option>
+        <option value="REFUSE">Refusés</option>
+      </select>
+      
+      <select class="filter-select" [(ngModel)]="sortByAll" (change)="sortAllProducts()">
+        <option value="recent">Plus récent</option>
+        <option value="name">Nom A-Z</option>
+        <option value="price-asc">Prix croissant</option>
+        <option value="price-desc">Prix décroissant</option>
+      </select>
+    </div>
+
+    <!-- Products Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Liste des produits ({{ filteredAllProducts.length }})</h3>
+        <div class="view-toggle">
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewMode === 'table'"
+            (click)="viewMode = 'table'">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewMode === 'grid'"
+            (click)="viewMode = 'grid'">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="table-container" *ngIf="viewMode === 'table' && paginatedProducts.length > 0">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Producteur</th>
+              <th>Catégorie</th>
+              <th>Prix</th>
+              <th>Stock</th>
+              <th>Statut</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of paginatedProducts">
+              <td>
+                <div class="product-cell">
+                  <img 
+                    [src]="product?.images && product.images.length > 0 ? getImageUrl(product.images[0].chemin) : 'assets/images/placeholder.jpg'" 
+                    [alt]="product.nom" 
+                    class="product-thumb">
+                  <div class="product-cell-info">
+                    <span class="product-cell-name">{{ product.nom }}</span>
+                    <span class="product-cell-weight">{{ product.poids }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="producer-cell">
+                  <div class="producer-avatar">{{ getInitials(product.producteur?.utilisateur?.nomComplet) }}</div>
+                  <span>{{ product.producteur?.utilisateur?.nomComplet || 'N/A' }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="category-tag">{{ product.categorie?.nom || 'N/A' }}</span>
+              </td>
+              <td class="price-cell">{{ product.prix }} Fr</td>
+              <td>
+                <span class="stock-badge" [class.low]="product.stock < product.seuilAlerteStock">
+                  {{ product.stock }}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="product.validationAdmin.toLowerCase()">
+                  {{ getValidationLabel(product.validationAdmin) }}
+                </span>
+              </td>
+              <td class="date-cell">{{ product.dateAjout | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-table-action" (click)="viewProductDetails(product)" title="Voir">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                      <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                    </svg>
+                  </button>
+                  <button class="btn-table-action" (click)="editProduct(product)" title="Modifier">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    </svg>
+                  </button>
+                  <button class="btn-table-action delete" (click)="deleteProduct(product)" title="Supprimer">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M3 4h10M5 4V3h6v1M6 7v4M10 7v4M4 4l1 9h6l1-9" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Grid View -->
+      <div class="grid-container" *ngIf="viewMode === 'grid' && paginatedProducts.length > 0">
+        <div class="product-grid-card" *ngFor="let product of paginatedProducts">
+          <div class="grid-card-image">
+            <img 
+              [src]="product?.images && product.images.length > 0 ? getImageUrl(product.images[0].chemin) : 'assets/images/placeholder.jpg'" 
+              [alt]="product.nom">
+            <span class="grid-status-badge" [ngClass]="product.validationAdmin.toLowerCase()">
+              {{ getValidationLabel(product.validationAdmin) }}
+            </span>
+          </div>
+          <div class="grid-card-body">
+            <h4>{{ product.nom }}</h4>
+            <p class="grid-producer">{{ product.producteur?.utilisateur?.nomComplet }}</p>
+            <div class="grid-card-footer">
+              <span class="grid-price">{{ product.prix }} Fr</span>
+              <div class="grid-actions">
+                <button class="btn-grid-action" (click)="viewProductDetails(product)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                  </svg>
+                </button>
+                <button class="btn-grid-action" (click)="editProduct(product)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M11 2l3 3L5 14H2v-3L11 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredAllProducts.length === 0">
+        <div class="empty-icon">📦</div>
+        <h3>Aucun produit trouvé</h3>
+        <p>Aucun produit ne correspond à vos critères</p>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="filteredAllProducts.length > pageSize">
+        <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+          Précédent
+        </button>
+        <div class="pagination-info">
+          Page {{ currentPage }} sur {{ totalPages }}
+        </div>
+        <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Suivant
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Product Details Modal -->
+<div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeDetailsModal()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+    
+    <div class="modal-body" *ngIf="selectedProduct">
+      <div class="modal-images">
+        <img 
+          [src]="selectedProduct.images && selectedProduct.images.length > 0 ? getImageUrl(selectedProduct.images[0].chemin) : 'assets/images/placeholder.jpg'" 
+          [alt]="selectedProduct.nom" 
+          class="modal-main-image">
+      </div>
+      
+      <div class="modal-info">
+        <div class="modal-header-section">
+          <h2>{{ selectedProduct.nom }}</h2>
+          <span class="modal-status-badge" [ngClass]="selectedProduct.validationAdmin.toLowerCase()">
+            {{ getValidationLabel(selectedProduct.validationAdmin) }}
+          </span>
+        </div>
+        
+        <div class="modal-section">
+          <h3>Description</h3>
+          <p>{{ selectedProduct.description }}</p>
+        </div>
+        
+        <div class="modal-grid">
+          <div class="modal-item">
+            <span class="modal-label">Prix</span>
+            <span class="modal-value price">{{ selectedProduct.prix }} Fr</span>
+          </div>
+          <div class="modal-item">
+            <span class="modal-label">Stock</span>
+            <span class="modal-value">{{ selectedProduct.stock }} {{ selectedProduct.poids }}</span>
+          </div>
+          <div class="modal-item">
+            <span class="modal-label">Catégorie</span>
+            <span class="modal-value">{{ selectedProduct.categorie?.nom }}</span>
+          </div>
+          <div class="modal-item">
+            <span class="modal-label">Producteur</span>
+            <span class="modal-value">{{ selectedProduct.producteur?.utilisateur?.nomComplet }}</span>
+          </div>
+        </div>
+        
+        <div class="modal-actions" *ngIf="selectedProduct.validationAdmin === 'EN_ATTENTE'">
+          <button class="btn-modal-reject" (click)="rejectProduct(selectedProduct)">
+            Refuser
+          </button>
+          <button class="btn-modal-validate" (click)="validateProduct(selectedProduct)">
+            Valider
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
